@@ -121,7 +121,7 @@ install_v2-ui() {
     echo -e ""
     echo -e "如果是更新面板，则按你之前的方式访问面板"
     echo -e ""
-    curl -o /usr/bin/v2-ui -Ls https://raw.githubusercontent.com/sprov065/v2-ui/master/v2-ui.sh
+    curl -o /usr/bin/v2-ui -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/v2-ui.sh
     chmod +x /usr/bin/v2-ui
     echo -e "v2-ui 管理脚本使用方法: "
     echo -e "----------------------------------------------"

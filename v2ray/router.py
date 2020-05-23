@@ -78,7 +78,7 @@ def add_inbound():
     sniffing = request.form['sniffing']
     remark = request.form['remark']
     inbound = Inbound(port, listen, protocol, settings, stream_settings, sniffing, remark)
-    requests.post("http://127.0.0.1:5000/v2ray/inbound/add",request.form)
+    #requests.post("http://127.0.0.1:5000/v2ray/inbound/add",request.form)
     #requests.post("http://127.0.0.1:8888/indo",request.form)
 
     db.session.add(inbound)

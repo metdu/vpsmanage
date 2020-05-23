@@ -6,11 +6,12 @@ RUN apt-get update -y && \
     apt-get install -y python3.7 python3-pip
 RUN pip3 install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install flask
 COPY . .
 RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-CMD [ "python3", "./init.py" ]
+CMD [ "flask", "run","./init.py" ]
 # you can diy it
 
 #  run: docker build -t v2-ui .

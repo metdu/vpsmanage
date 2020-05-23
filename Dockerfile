@@ -1,7 +1,9 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
-LABEL 99kies 1290017556@qq.com https://github.com/99kies
-
+WORKDIR /var/local
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 RUN apt-get update && \
     apt-get install curl -y && \
     cd / && \

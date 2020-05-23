@@ -11,7 +11,7 @@ COPY . .
 RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-CMD [ "flask", "run","./init.py" ]
+CMD [ "flask", "run" ]
 # you can diy it
 
 #  run: docker build -t v2-ui .

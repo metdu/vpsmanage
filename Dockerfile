@@ -5,7 +5,7 @@ LABEL 99kies 1290017556@qq.com https://github.com/99kies
 RUN apt-get update && \
     apt-get install curl -y && \
     cd / && \
-    curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/v2-ui.sh > v2-ui.sh
+    curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
 
 # you can diy it
 

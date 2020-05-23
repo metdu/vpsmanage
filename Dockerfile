@@ -3,12 +3,11 @@ FROM ubuntu:18.04
 WORKDIR /var/local
 COPY requirements.txt ./
 RUN apt-get update -y && \
-    apt-get install -y python3.7 python3-pip python3.7-dev
+    apt-get install -y python3.7 python3-pip
 RUN pip3 install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN apt-get update && \
-    apt-get install curl -y && \
+RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
 CMD [ "python3", "./init.py" ]

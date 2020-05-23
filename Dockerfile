@@ -7,7 +7,9 @@ RUN apt-get update -y && \
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 RUN pip3 install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install flask
+#RUN pip install flask
+RUN pip install flask gunicorn gevent
+
 RUN apt-get install -y locales
 RUN locale-gen zh_CN
 RUN locale-gen zh_CN.utf8
@@ -20,7 +22,9 @@ COPY . .
 RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-CMD [ "flask", "run" ]
+#CMD [ "flask", "run" ]
+CMD gunicorn -w 4 init:init
+
 # you can diy it
 
 #  run: docker build -t v2-ui .

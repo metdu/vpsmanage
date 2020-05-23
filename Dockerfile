@@ -11,7 +11,7 @@ RUN apt-get update && \
     apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-CMD [ "python", "./init.py" ]
+CMD [ "python3", "./init.py" ]
 # you can diy it
 
 #  run: docker build -t v2-ui .

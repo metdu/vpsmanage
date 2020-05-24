@@ -22,7 +22,7 @@ COPY . .
 RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-CMD [ "python3", "v2-ui.py" ]
+#CMD [ "python3", "v2-ui.py" ]
 #CMD gunicorn -w 4 u2-ui:u2-ui
 
 # you can diy it

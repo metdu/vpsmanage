@@ -10,7 +10,7 @@ docker rmi v2-ui
 #打包镜像
 docker build -t v2-ui .
 #启动容器
-docker run -d  --net=host  --name v2-ui v2-ui
+docker run -d  --net=host  --name v2-ui v2-ui  /sbin/init
 #docker run -d --net=host --privileged --name v2-ui v2-ui /sbin/init
 #进入容器
-#docker exec -it v2-ui bash
+docker exec -it v2-ui bash

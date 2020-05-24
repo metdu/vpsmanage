@@ -1,5 +1,5 @@
 #FROM ubuntu:18.04
-FROM ython:3.7
+FROM python:3.7
 WORKDIR /var/local
 COPY requirements.txt ./
 RUN apt-get update -y && \

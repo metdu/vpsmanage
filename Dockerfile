@@ -22,7 +22,7 @@ COPY . .
 RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-CMD [ "flask", "run" ]
+CMD [ "flask", "run","host=0.0.0.0" ]
 #CMD gunicorn -w 4 u2-ui:u2-ui
 
 # you can diy it

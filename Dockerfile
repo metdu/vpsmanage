@@ -1,9 +1,9 @@
 #FROM ubuntu:18.04
-
+FROM ython:3.7
 WORKDIR /var/local
 COPY requirements.txt ./
 RUN apt-get update -y && \
-    apt-get install -y python3.7 python3-pip
+    apt-get install -y  python3-pip
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 RUN pip3 install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt

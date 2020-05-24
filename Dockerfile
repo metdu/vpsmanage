@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 #FROM python:3.7
-WORKDIR /var/local
+#WORKDIR /var/local
 COPY requirements.txt ./
 RUN apt-get update -y && \
     apt-get install -y python3.7 python3-pip

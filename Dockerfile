@@ -1,6 +1,6 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 #FROM python:3.7
-#WORKDIR /var/local
+WORKDIR /var/local
 COPY requirements.txt ./
 RUN apt-get update -y && \
     apt-get install -y python3.7 python3-pip
@@ -22,7 +22,7 @@ COPY . .
 RUN apt-get install curl -y && \
     cd / && \
     curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh
-#CMD [ "python3", "v2-ui.py" ]
+CMD ["/sbin/init && python3  v2-ui.py" ]
 #CMD gunicorn -w 4 u2-ui:u2-ui
 
 # you can diy it

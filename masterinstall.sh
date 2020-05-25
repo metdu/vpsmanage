@@ -45,7 +45,22 @@ if [[ -z "$os_version" && -f /etc/lsb-release ]]; then
 fi
 
 if [[ x"${release}" == x"centos" ]]; then
-    yum -y install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel epel-release gcc
+
+    if [[ ${os_version} -le 6 ]]; then
+        echo -e "${red}请使用 CentOS 7 或更高版本的系统！${plain}\n" && exit 1
+    fi
+elif [[ x"${release}" == x"ubuntu" ]]; then
+    if [[ ${os_version} -lt 16 ]]; then
+        echo -e "${red}请使用 Ubuntu 16 或更高版本的系统！${plain}\n" && exit 1
+    fi
+elif [[ x"${release}" == x"debian" ]]; then
+
+    if [[ ${os_version} -lt 8 ]]; then
+        echo -e "${red}请使用 Debian 8 或更高版本的系统！${plain}\n" && exit 1
+    fi
+fi
+install_python(){
+  yum -y install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel epel-release gcc
     wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz
     tar zxvf Python-3.7.5.tgz
     cd Python-3.7.5
@@ -60,11 +75,8 @@ if [[ x"${release}" == x"centos" ]]; then
     ln -s /usr/local/bin/python3.7 /usr/bin/python3
     ln -s /usr/local/bin/pip3.7 /usr/bin/pip3
     #其他版本： https://www.python.org/downloads/source/
-    if [[ ${os_version} -le 6 ]]; then
-        echo -e "${red}请使用 CentOS 7 或更高版本的系统！${plain}\n" && exit 1
-    fi
-elif [[ x"${release}" == x"ubuntu" ]]; then
-    apt  install -y wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel epel-release gcc
+
+     apt  install -y wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel epel-release gcc
     wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz
     tar zxvf Python-3.7.5.tgz
     cd Python-3.7.5
@@ -78,28 +90,8 @@ elif [[ x"${release}" == x"ubuntu" ]]; then
     rm -rf /usr/bin/python3
     ln -s /usr/local/bin/python3.7 /usr/bin/python3
     ln -s /usr/local/bin/pip3.7 /usr/bin/pip3
-    if [[ ${os_version} -lt 16 ]]; then
-        echo -e "${red}请使用 Ubuntu 16 或更高版本的系统！${plain}\n" && exit 1
-    fi
-elif [[ x"${release}" == x"debian" ]]; then
-    apt  install -y wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel epel-release gcc
-    wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz
-    tar zxvf Python-3.7.5.tgz
-    cd Python-3.7.5
-    ./configure --with-ssl
-    make && make install
-    cd ..
-    apt  install -y python3-pip
+}
 
-    # 删除软链接，建立新的软连接
-    rm -rf /usr/bin/pip3
-    rm -rf /usr/bin/python3
-    ln -s /usr/local/bin/python3.7 /usr/bin/python3
-    ln -s /usr/local/bin/pip3.7 /usr/bin/pip3
-    if [[ ${os_version} -lt 8 ]]; then
-        echo -e "${red}请使用 Debian 8 或更高版本的系统！${plain}\n" && exit 1
-    fi
-fi
 
 install_base() {
     if [[ x"${release}" == x"centos" ]]; then
@@ -136,6 +128,7 @@ close_firewall() {
     fi
 }
 install_master(){
+  systemctl stop v2master
   python_version =  python3 --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'
 if [ $python_version -gt 2 ];then
   echo "已安装Python3"
@@ -150,7 +143,15 @@ if [ $python_version -gt 2 ];then
   git remote add upstream https://github.com/available2099/vpsmanage.git
   git fetch upstream
   pip install --no-cache-dir -r requirements.txt
-  python3 v2-ui.py
+  cp -f v2master.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable v2master
+    systemctl start v2master
+    echo -e "${green}v2master 安装完成，面板已启动，"
+    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
+    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
+    echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
+  #python3 v2-ui.py
 else
   python_v =  python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'
   echo "已安装Python"+$python_v
@@ -209,6 +210,7 @@ install_v2-ui() {
 echo -e "${green}开始安装${plain}"
 install_base
 install_v2ray
+install_master
 #close_firewall
 #install_v2-uidocker
 #install_v2-ui

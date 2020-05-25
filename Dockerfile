@@ -19,7 +19,7 @@ ENV LANG zh_CN.UTF-8
 ENV LANGUAGE zh_CN.UTF-8
 ENV LC_ALL zh_CN.UTF-8
 COPY . .
-ENTRYPOINT ["bash", "/var/local/install.sh"]
+#ENTRYPOINT ["bash", "/var/local/install.sh"]
 #RUN apt-get install curl -y && \
 #    cd / && \
 #    curl -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/install.sh > v2-ui.sh

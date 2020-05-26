@@ -136,7 +136,7 @@ docker_install()
     else
     	echo "安装docker环境..."
          apt-get update\
-          && apt-get -y install vim curl sudo\
+          && apt-get -y install vim curl sudo inotify-tools\
           && curl -fsSL https://get.docker.com/ | sh || apt-get -y install docker.io
         echo "安装docker环境...安装完成!"
     fi

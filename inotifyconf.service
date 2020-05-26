@@ -1,9 +1,10 @@
 [Unit]
 Description = inotifyv2change
 After=network.target
-Wants=network.target
+After=network-online.target
+Wants=network-online.target
 [Service]
-ExecStart = /var/local/v2master/inotifyconf.sh
+ExecStart =/usr/bin/nohup /var/local/v2master/inotifyconf.sh &
 Restart = always
 Type = simple
 

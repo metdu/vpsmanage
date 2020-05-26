@@ -127,10 +127,24 @@ close_firewall() {
         iptables -F
     fi
 }
+docker_install()
+{
+	echo "检查Docker......"
+	docker -v
+    if [ $? -eq  0 ]; then
+        echo "检查到Docker已安装!"
+    else
+    	echo "安装docker环境..."
+         apt-get update\
+          && apt-get -y install vim curl sudo\
+          && curl -fsSL https://get.docker.com/ | sh || apt-get -y install docker.io
+        echo "安装docker环境...安装完成!"
+    fi
+    # 创建公用网络==bridge模式
+    #docker network create share_network
+}
 install_docker(){
-  apt-get update\
-  && apt-get -y install vim curl sudo\
-  && curl -fsSL https://get.docker.com/ | sh || apt-get -y install docker.io
+docker_install
   cd /var/local
   mkdir v2master
   cd v2master
@@ -139,6 +153,10 @@ install_docker(){
   git remote add upstream https://github.com/available2099/vpsmanage.git
   git fetch upstream
   chmod 777 /var/local/v2master
+  #删除容器
+  docker rm -f $(docker ps -a | grep v2-ui | awk '{print $1}')
+#删除镜像
+  docker rmi v2-ui
   #打包镜像
   docker build -t v2-ui .
   #启动容器

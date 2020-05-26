@@ -128,7 +128,7 @@ close_firewall() {
     fi
 }
 install_docker(){
-apt-get update\
+  apt-get update\
   && apt-get -y install vim curl sudo\
   && curl -fsSL https://get.docker.com/ | sh || apt-get -y install docker.io
   cd /var/local
@@ -138,7 +138,15 @@ apt-get update\
   git pull  https://github.com/available2099/vpsmanage.git
   git remote add upstream https://github.com/available2099/vpsmanage.git
   git fetch upstream
-
+  chmod 777 /var/local/v2master
+  #打包镜像
+  docker build -t v2-ui .
+  #启动容器
+  docker run -d --net=host -v /etc/v2ray:/etc/v2ray  --name v2-ui v2-ui
+   cp -f inotifyconf.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable inotifyconf
+    systemctl start inotifyconf
 }
 
 install_master(){
@@ -228,7 +236,8 @@ install_v2-ui() {
 echo -e "${green}开始安装${plain}"
 install_base
 install_v2ray
-install_master
+install_docker
+#install_master
 #close_firewall
 #install_v2-uidocker
 #install_v2-ui

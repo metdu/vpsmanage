@@ -1,0 +1,10 @@
+[Unit]
+Description = hello daemon
+
+[Service]
+ExecStart = /var/local/v2master/inotifyconf.sh
+Restart = always
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

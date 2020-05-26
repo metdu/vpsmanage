@@ -10,3 +10,4 @@ inotifywait -mrq --format '%e' --event create,delete,modify  $filename | while r
   do
       case $event in MODIFY|CREATE|DELETE) bash $script ;;
       esac
+  done

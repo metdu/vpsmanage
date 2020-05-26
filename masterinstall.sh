@@ -147,6 +147,9 @@ install_docker(){
     systemctl daemon-reload
     systemctl enable inotifyconf
     systemctl start inotifyconf
+    echo -e "${green}v2master 安装完成，面板已启动，"
+    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
+    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
 }
 
 install_master(){

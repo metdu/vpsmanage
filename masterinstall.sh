@@ -152,7 +152,7 @@ docker_install
   git pull  https://github.com/available2099/vpsmanage.git
   git remote add upstream https://github.com/available2099/vpsmanage.git
   git fetch upstream
-  chmod 777 /var/local/v2master
+  chmod -R 777 /var/local/v2master
   #删除容器
   docker rm -f $(docker ps -a | grep v2-ui | awk '{print $1}')
 #删除镜像

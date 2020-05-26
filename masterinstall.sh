@@ -127,6 +127,20 @@ close_firewall() {
         iptables -F
     fi
 }
+install_docker(){
+apt-get update\
+  && apt-get -y install vim curl sudo\
+  && curl -fsSL https://get.docker.com/ | sh || apt-get -y install docker.io
+  cd /var/local
+  mkdir v2master
+  cd v2master
+  git init
+  git pull  https://github.com/available2099/vpsmanage.git
+  git remote add upstream https://github.com/available2099/vpsmanage.git
+  git fetch upstream
+
+}
+
 install_master(){
   systemctl stop v2master
   python_version =  python3 --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'

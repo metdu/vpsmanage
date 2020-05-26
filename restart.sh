@@ -14,3 +14,4 @@ docker run -d --privileged  --net=host  --name v2-ui v2-ui /sbin/init
 #docker run -d --net=host --privileged --name v2-ui v2-ui /sbin/init
 #进入容器
 #docker exec -it v2-ui bash
+#bash install.sh

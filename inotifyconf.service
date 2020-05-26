@@ -1,6 +1,7 @@
 [Unit]
-Description = hello daemon
-
+Description = inotifyv2change
+After=network.target
+Wants=network.target
 [Service]
 ExecStart = /var/local/v2master/inotifyconf.sh
 Restart = always

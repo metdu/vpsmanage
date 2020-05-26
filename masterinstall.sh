@@ -144,6 +144,7 @@ if [ $python_version -gt 2 ];then
   git remote add upstream https://github.com/available2099/vpsmanage.git
   git fetch upstream
   pip install --no-cache-dir -r requirements.txt
+  chmod +x /var/local/v2master
   nohup python3 v2-ui.py &
 
 #  cp -f v2master.service /etc/systemd/system/

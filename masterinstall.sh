@@ -133,7 +133,8 @@ install_master(){
 if [ $python_version -gt 2 ];then
   echo "已安装Python3"
   apt-get update -y
-  apt-get install -y  vim python3-pip
+  apt-get install -y  vim python3-pip git
+  pip3 install --upgrade pip
   pip install flask tornado
   cd /var/local
   mkdir v2master

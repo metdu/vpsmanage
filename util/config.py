@@ -49,7 +49,7 @@ def all_settings():
 
 
 def get_port():
-    return __get('port', 12345)
+    return __get('port', 65432)
 
 
 def get_address():

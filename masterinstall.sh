@@ -160,7 +160,7 @@ docker_install
   #打包镜像
   docker build -t v2-ui .
   #启动容器
-  docker run -d --net=host -v /etc/v2ray:/etc/v2ray  --name v2-ui v2-ui
+  docker run -d --net=host -v /etc/v2ray:/etc/v2ray  --restart=always  --name v2-ui v2-ui
    cp -f inotifyconf.service /etc/systemd/system/
     systemctl daemon-reload
     systemctl enable inotifyconf

@@ -188,8 +188,8 @@ if [ $python_version -gt 2 ];then
   git fetch upstream
   pip install --no-cache-dir -r requirements.txt
   chmod +x /var/local/v2master
-  nohup python3 v2-ui.py &
-
+ # nohup python3 v2-ui.py &
+ python3 v2-ui.py
 #  cp -f v2master.service /etc/systemd/system/
 #    systemctl daemon-reload
 #    systemctl enable v2master
@@ -257,8 +257,8 @@ install_v2-ui() {
 echo -e "${green}开始安装${plain}"
 install_base
 install_v2ray
-install_docker
-#install_master
+#install_docker
+install_master
 #close_firewall
 #install_v2-uidocker
 #install_v2-ui

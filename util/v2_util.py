@@ -3,6 +3,8 @@ import json
 import logging
 import re
 import sys
+import string
+import random
 from enum import Enum
 from threading import Timer
 
@@ -117,7 +119,8 @@ def get_inbounds_traffic(reset=True):
     if __api_port < 0:
         logging.warning('v2ray api port is not configured')
         return None
-    cmd = __get_v2ray_api_cmd('', 'StatsService', 'QueryStats', '', 'true' if reset else 'false')
+    cmd = __get_v2ray_api_cmd('', '[StatsService]', 'QueryStats', '', 'true' if reset else 'false')
+    print("downoruplinkcmd:"+cmd)
     result, code = cmd_util.exec_cmd(cmd)
     if code != 0:
         logging.warning('v2ray api code %d' % code)
@@ -144,3 +147,8 @@ def get_inbounds_traffic(reset=True):
                 _type: value
             })
     return inbounds
+
+def random_email():
+    domain = ['163', 'qq', 'sina', '126', 'gmail', 'outlook', 'icloud']
+    core_email = "@{}.com".format(random.choice(domain))
+    return ''.join(random.sample(string.ascii_letters + string.digits, 8)) + core_email

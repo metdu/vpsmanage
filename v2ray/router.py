@@ -12,6 +12,7 @@ from v2ray.models import Inbound
 #from v2ray.modelsmysql import InboundMysql
 from init import mysqlsesson
 from util.mysql_util import InboundMysql
+from util.v2_util import random_email
 import requests
 
 v2ray_bp = Blueprint('v2ray', __name__, url_prefix='/v2ray')
@@ -74,16 +75,20 @@ def add_inbound():
     listen = request.form['listen']
     protocol = request.form['protocol']
     settings = request.form['settings']
+    remail = '"email":"'+random_email()+'",'
+    str_list = list(settings)
+    str_list.insert(13, remail)#插入堆积
+    newsettings = ''.join(str_list)
     stream_settings = request.form['stream_settings']
     sniffing = request.form['sniffing']
     remark = request.form['remark']
-    inbound = Inbound(port, listen, protocol, settings, stream_settings, sniffing, remark)
+    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
     #requests.post("http://67.230.168.201:65432/v2ray/inbound/add",jsonify(request.form).json)
     #requests.post("http://127.0.0.1:8888/indo",request.form)
 
     db.session.add(inbound)
     db.session.commit()
-    inboundMysql =InboundMysql(port, listen, protocol, settings, stream_settings, sniffing, remark)
+    inboundMysql =InboundMysql(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
     mysqlsesson.add(inboundMysql)
     mysqlsesson.commit()
     return jsonify(

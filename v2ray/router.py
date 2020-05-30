@@ -11,8 +11,9 @@ from util.v2_jobs import v2_config_change
 from v2ray.models import Inbound
 #from v2ray.modelsmysql import InboundMysql
 from init import mysqlsesson
-from util.mysql_util import InboundMysql
-from util.v2_util import random_email
+from util.mysql_util import Inbound as InboundMysql,SsNode,UserSubscribe
+from util.v2_util import random_email,get_ip
+import base64
 import requests
 
 v2ray_bp = Blueprint('v2ray', __name__, url_prefix='/v2ray')
@@ -75,7 +76,8 @@ def add_inbound():
     listen = request.form['listen']
     protocol = request.form['protocol']
     settings = request.form['settings']
-    remail = '"email":"'+random_email()+'",'
+    email=random_email()
+    remail = '"email":"'+email+'",'
     str_list = list(settings)
     str_list.insert(13, remail)#插入堆积
     newsettings = ''.join(str_list)
@@ -83,13 +85,25 @@ def add_inbound():
     sniffing = request.form['sniffing']
     remark = request.form['remark']
     inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
+
+    local_ip = get_ip()
+
+
     #requests.post("http://67.230.168.201:65432/v2ray/inbound/add",jsonify(request.form).json)
     #requests.post("http://127.0.0.1:8888/indo",request.form)
 
     db.session.add(inbound)
     db.session.commit()
+    #插入mysql inbound
     inboundMysql =InboundMysql(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
     mysqlsesson.add(inboundMysql)
+    #插入mysql 节点表
+    Node=SsNode(protocol,local_ip,json.loads(settings)['clients'][0]['id'],json.loads(settings)['clients'][0]['alterId'],port,json.loads(stream_settings)['wsSettings']['path'],remark,json.loads(stream_settings)['network'])
+    #插入mysql 用户表
+    userSubscribe= UserSubscribe(base64.b64encode(email.encode('utf-8')),port,5,1)
+    mysqlsesson.add(Node)
+    mysqlsesson.add(userSubscribe)
+
     mysqlsesson.commit()
     return jsonify(
         Msg(True,

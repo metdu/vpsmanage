@@ -7,6 +7,7 @@ import string
 import random
 from enum import Enum
 from threading import Timer
+import urllib.request
 
 from util import config, list_util, cmd_util, server_info, file_util
 from v2ray.exceptions import V2rayException
@@ -115,11 +116,11 @@ def __get_v2ray_api_cmd(address, service, method, pattern, reset):
     return cmd
 
 
-def get_inbounds_traffic(reset=True):
+def get_inbounds_traffic(reset=False):
     if __api_port < 0:
         logging.warning('v2ray api port is not configured')
         return None
-    cmd = __get_v2ray_api_cmd('', '[StatsService]', 'QueryStats', '', 'true' if reset else 'false')
+    cmd = __get_v2ray_api_cmd('', 'StatsService', 'QueryStats', '', 'true' if reset else 'false')
     print("downoruplinkcmd:"+cmd)
     result, code = cmd_util.exec_cmd(cmd)
     if code != 0:
@@ -152,3 +153,14 @@ def random_email():
     domain = ['163', 'qq', 'sina', '126', 'gmail', 'outlook', 'icloud']
     core_email = "@{}.com".format(random.choice(domain))
     return ''.join(random.sample(string.ascii_letters + string.digits, 8)) + core_email
+
+def get_ip():
+    """
+    获取本地ip
+    """
+    my_ip = ""
+    try:
+        my_ip = urllib.request.urlopen('http://api.ipify.org').read()
+    except Exception:
+        my_ip = urllib.request.urlopen('http://icanhazip.com').read()
+    return bytes.decode(my_ip).strip()

@@ -205,7 +205,7 @@ else
   echo "退出安装,需要安装Python3环境"
 fi
 
-  python3 v2-ui.py
+#  python3 v2-ui.py
 }
 install_v2-ui() {
     systemctl stop v2-ui

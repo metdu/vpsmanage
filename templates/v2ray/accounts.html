@@ -65,6 +65,10 @@
                             </div>
                             <div>
                                 <a-row>
+                                      <a-col class="hidden-md-and-up" :xs="24" :sm="24" :lg="12">
+                                        {{ _('VIP等级') }}：
+                                        <a-tag color="green">[[ inbound.level ]]</a-tag>
+                                    </a-col>
                                     <a-col class="hidden-md-and-up" :xs="24" :sm="24" :lg="12">
                                         {{ _('protocol') }}：
                                         <a-tag color="green">[[ inbound.protocol ]]</a-tag>
@@ -354,6 +358,7 @@
                         sniffing: [Protocols.VMESS, Protocols.SHADOWSOCKS].indexOf(inbound.protocol) >= 0 ?
                             inbound.sniffing.toString(false) : '{}',
                         remark: inbound.remark,
+                        level:inbound.level,
                     };
                     this.submit('/v2ray/inbound/add', data, inModal, callback, callback);
                 },
@@ -368,6 +373,8 @@
                             inbound.sniffing.toString(false) : '{}',
                         remark: inbound.remark,
                         enable: inbound.enable,
+                        level:inbound.level,
+
                     };
                     this.submit('/v2ray/inbound/update/' + inbound.id, data, inModal, callback, callback);
                 },

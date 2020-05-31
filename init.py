@@ -40,6 +40,7 @@ def init_db():
     Inbound.__name__.lower()
     Setting.__name__.lower()
     file_util.mkdirs('/etc/v2-ui/')
+    #db.drop_all()
     db.create_all()
 
 
@@ -62,10 +63,13 @@ def init_bps():
     from base.router import base_bp
     from server.router import server_bp
     from v2ray.router import v2ray_bp
+    from subscribe.subscribe import sub_se
+
     bps = [
         base_bp,
         v2ray_bp,
         server_bp,
+        sub_se,
     ]
     if not app.debug:
         base_path = config.get_base_path()

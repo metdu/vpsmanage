@@ -16,6 +16,15 @@
                 <a-select-option v-for="p in Protocols" :key="p" :value="p">[[ p ]]</a-select-option>
             </a-select>
         </a-form-item>
+            <a-form-item label="{{ _('用户等级') }}">
+                <a-select v-model="inModal.inbound.level">
+                    <a-select-option value="0">VIP0</a-select-option>
+                    <a-select-option value="1">VIP1</a-select-option>
+                    <a-select-option value="2">VIP2</a-select-option>
+                    <a-select-option value="3">VIP3</a-select-option>
+                    <a-select-option value="4">VIP4</a-select-option>
+                </a-select>
+            </a-form-item>
         <a-form-item>
             <span slot="label">
                 {{ _('listening IP') }}
@@ -69,7 +78,6 @@
 
     <!-- stream settings -->
     <template v-if="inModal.inbound.protocol === Protocols.VMESS">
-
         <!-- select stream network -->
         <a-form layout="inline">
             <a-form-item label="{{ _('transport') }}">

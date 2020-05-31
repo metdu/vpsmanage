@@ -536,6 +536,7 @@ class Inbound extends V2CommonClass {
                 sniffing=new Sniffing(),
                 remark='',
                 enable=true,
+                level='0',
                 ) {
         super();
         this.port = port;
@@ -547,6 +548,7 @@ class Inbound extends V2CommonClass {
         this.sniffing = sniffing;
         this.remark = remark;
         this.enable = enable;
+        this.level = level;
     }
 
     reset() {
@@ -559,6 +561,7 @@ class Inbound extends V2CommonClass {
         this.sniffing = new Sniffing();
         this.remark = '';
         this.enable = true;
+        this.level = '0';
     }
 
     genVmessLink(address='') {
@@ -647,6 +650,7 @@ class Inbound extends V2CommonClass {
             Sniffing.fromJson(json.sniffing),
             json.remark,
             json.enable,
+            json.level
         )
     }
 
@@ -665,6 +669,7 @@ class Inbound extends V2CommonClass {
             sniffing: this.sniffing.toJson(),
             remark: this.remark,
             enable: this.enable,
+            level:this.level,
         };
     }
 }

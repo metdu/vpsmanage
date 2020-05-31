@@ -11,7 +11,7 @@ from util.v2_jobs import v2_config_change
 from v2ray.models import Inbound
 #from v2ray.modelsmysql import InboundMysql
 from init import mysqlsesson
-from util.mysql_util import Inbound as InboundMysql,SsNode,UserSubscribe
+from util.mysql_util import Inbound as InboundMysql,SsNode,UserSubscribe,VpsDevice
 from util.v2_util import random_email,get_ip
 import base64
 import requests
@@ -84,12 +84,16 @@ def add_inbound():
     stream_settings = request.form['stream_settings']
     sniffing = request.form['sniffing']
     remark = request.form['remark']
-    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
+    # 当前用户等级
+    user_level = request.form['level']
+    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark,user_level)
 
     local_ip = get_ip()
+    devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level).all()
+    for device in devices:
+        if local_ip != device.ip:
+            requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", jsonify(request.form).json, timeout=3)
 
-
-    #requests.post("http://67.230.168.201:65432/v2ray/inbound/add",jsonify(request.form).json)
     #requests.post("http://127.0.0.1:8888/indo",request.form)
 
     db.session.add(inbound)
@@ -100,7 +104,7 @@ def add_inbound():
     #插入mysql 节点表
     Node=SsNode(protocol,local_ip,json.loads(settings)['clients'][0]['id'],json.loads(settings)['clients'][0]['alterId'],port,json.loads(stream_settings)['wsSettings']['path'],remark,json.loads(stream_settings)['network'])
     #插入mysql 用户表
-    userSubscribe= UserSubscribe(base64.b64encode(email.encode('utf-8')),port,5,1)
+    userSubscribe= UserSubscribe(base64.b64encode(email.encode('utf-8')),port,user_level,1)
     mysqlsesson.add(Node)
     mysqlsesson.add(userSubscribe)
 
@@ -129,6 +133,8 @@ def update_inbound(in_id):
     add_if_not_none(update, 'sniffing', request.form.get('sniffing'))
     add_if_not_none(update, 'remark', request.form.get('remark'))
     add_if_not_none(update, 'enable', request.form.get('enable') == 'true')
+    add_if_not_none(update, 'level', request.form.get('level'))
+
     Inbound.query.filter_by(id=in_id).update(update)
     db.session.commit()
     return jsonify(

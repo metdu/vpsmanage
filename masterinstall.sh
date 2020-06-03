@@ -188,8 +188,8 @@ if [ $python_version -gt 2 ];then
   git fetch upstream
   pip install --no-cache-dir -r requirements.txt
   chmod +x /var/local/v2master
- # nohup python3 v2-ui.py &
- python3 v2-ui.py
+  nohup python3 v2-ui.py &
+ #python3 v2-ui.py
 #  cp -f v2master.service /etc/systemd/system/
 #    systemctl daemon-reload
 #    systemctl enable v2master

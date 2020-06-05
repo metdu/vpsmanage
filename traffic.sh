@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_APISERVER=127.0.0.1:39092
+_APISERVER=127.0.0.1:62789
 _V2CTL=/usr/bin/v2ray/v2ctl
 
 apidata () {

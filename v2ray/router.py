@@ -71,6 +71,7 @@ def inbounds():
 @v2_config_change
 def add_inbound():
     port = int(request.form['port'])
+    print("进来了")
     if Inbound.query.filter_by(port=port).count() > 0:
         return jsonify(Msg(False, gettext('port exists')))
     listen = request.form['listen']
@@ -88,14 +89,14 @@ def add_inbound():
     user_level = request.form['level']
     # 是否更新所有服务器
     enable = request.form['enable']
-    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level, enable == 'true')
+    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level,
+                      enable == 'true')
     db.session.add(inbound)
     db.session.commit()
-    print("进来了")
     if enable == 'true':
         print("更新所有vps")
         local_ip = get_ip()
-        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level).all()
+        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
         inbound.enable = 'false'
         for device in devices:
             if local_ip != device.ip:

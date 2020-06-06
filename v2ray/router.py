@@ -9,10 +9,10 @@ from init import db
 from util import config, server_info
 from util.v2_jobs import v2_config_change
 from v2ray.models import Inbound
-#from v2ray.modelsmysql import InboundMysql
+# from v2ray.modelsmysql import InboundMysql
 from init import mysqlsesson
-from util.mysql_util import Inbound as InboundMysql,VpsNode,UserSubscribe,VpsDevice
-from util.v2_util import random_email,get_ip
+from util.mysql_util import Inbound as InboundMysql, VpsNode, UserSubscribe, VpsDevice
+from util.v2_util import random_email, get_ip
 import base64
 import requests
 
@@ -76,37 +76,42 @@ def add_inbound():
     listen = request.form['listen']
     protocol = request.form['protocol']
     settings = request.form['settings']
-    email=random_email()
-    remail = '"email":"'+email+'",'
+    email = random_email()
+    remail = '"email":"' + email + '",'
     str_list = list(settings)
-    str_list.insert(13, remail)#插入堆积
+    str_list.insert(13, remail)  # 插入堆积
     newsettings = ''.join(str_list)
     stream_settings = request.form['stream_settings']
     sniffing = request.form['sniffing']
     remark = request.form['remark']
     # 当前用户等级
     user_level = request.form['level']
-    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark,user_level)
-    #是否更新所有服务器
+    # 是否更新所有服务器
     enable = request.form['enable']
-    if  enable:
+    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level, enable == 'true')
+    db.session.add(inbound)
+    db.session.commit()
+
+    if enable == 'true':
         print("更新所有vps")
         local_ip = get_ip()
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level).all()
+        inbound.enable = 'false'
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", jsonify(request.form).json, timeout=3)
-        db.session.add(inbound)
-        db.session.commit()
+                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json(), timeout=3)
+
         # 插入mysql 用户表,生成订阅
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)
 
-    #插入mysql inbound
-    inboundMysql =InboundMysql(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
+    # 插入mysql inbound
+    inboundMysql = InboundMysql(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
     mysqlsesson.add(inboundMysql)
-    #插入mysql 节点表
-    Node=VpsNode(protocol,local_ip,json.loads(settings)['clients'][0]['id'],json.loads(settings)['clients'][0]['alterId'],port,json.loads(stream_settings)['wsSettings']['path'],remark,json.loads(stream_settings)['network'])
+    # 插入mysql 节点表
+    Node = VpsNode(protocol, local_ip, json.loads(settings)['clients'][0]['id'],
+                   json.loads(settings)['clients'][0]['alterId'], port,
+                   json.loads(stream_settings)['wsSettings']['path'], remark, json.loads(stream_settings)['network'])
     mysqlsesson.add(Node)
     mysqlsesson.commit()
     return jsonify(
@@ -134,6 +139,20 @@ def update_inbound(in_id):
     add_if_not_none(update, 'remark', request.form.get('remark'))
     add_if_not_none(update, 'enable', request.form.get('enable') == 'true')
     add_if_not_none(update, 'level', request.form.get('level'))
+    '''
+        if request.form.get('enable') == 'true':
+        print("删除所有vps")
+        local_ip = get_ip()
+        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= request.form.get('level')).all()
+        for device in devices:
+            if local_ip != device.ip:
+                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", jsonify(request.form).json, timeout=3)
+        db.session.add(inbound)
+        db.session.commit()
+        # 插入mysql 用户表,生成订阅
+        userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
+        mysqlsesson.add(userSubscribe)
+    '''
 
     Inbound.query.filter_by(id=in_id).update(update)
     db.session.commit()

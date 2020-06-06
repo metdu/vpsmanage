@@ -89,8 +89,7 @@ def add_inbound():
     user_level = request.form['level']
     # 是否更新所有服务器
     enable = request.form['enable']
-    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level,
-                      enable == 'true')
+    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
     db.session.add(inbound)
     db.session.commit()
     if enable == 'true':

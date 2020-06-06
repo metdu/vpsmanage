@@ -22,7 +22,7 @@ class Inbound(db.Model):
     level = Column(Integer, nullable=False, default=0)
 
     def __init__(self, port=None, listen=None, protocol=None,
-                 settings=None, stream_settings=None, sniffing=None, remark=None, level=None, enable=None):
+                 settings=None, stream_settings=None, sniffing=None, remark=None, level=None):
         self.port = port
         self.listen = listen
         self.protocol = protocol
@@ -33,7 +33,7 @@ class Inbound(db.Model):
         self.remark = remark
         self.up = 0
         self.down = 0
-        self.enable = enable
+        self.enable = True
         self.level = level
 
     def to_json(self):

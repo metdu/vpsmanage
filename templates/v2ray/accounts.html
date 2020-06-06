@@ -359,6 +359,8 @@
                             inbound.sniffing.toString(false) : '{}',
                         remark: inbound.remark,
                         level:inbound.level,
+                        enable: inbound.enable,
+
                     };
                     this.submit('/v2ray/inbound/add', data, inModal, callback, callback);
                 },

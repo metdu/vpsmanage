@@ -2,7 +2,7 @@ import flask
 from flask import Blueprint
 from base.models import User
 from subscribe.v2ray import V2ray
-from util.mysql_util import UserSubscribe, SsNode
+from util.mysql_util import UserSubscribe, VpsNode
 from init import mysqlsesson
 import base64
 import json
@@ -17,7 +17,7 @@ def subscribe(setting_id):
     if not User:
         return '{code":200,"msg":"不存在该订阅}'
     else:
-        NodeList = mysqlsesson.query(SsNode).filter(SsNode.v2_port == User.user_port).all()
+        NodeList = mysqlsesson.query(VpsNode).filter(VpsNode.v2_port == User.user_port).all()
         for node in NodeList:
             v2 = V2ray(node.desc, node.server,
                        node.v2_port, node.v2_id, node.v2_alter_id, node.v2_net, node.v2_path)
@@ -35,7 +35,7 @@ def subscribeqx(setting_id):
     if not Userfirst:
         return '{code":200,"msg":"不存在该订阅}'
     else:
-        NodeList = mysqlsesson.query(SsNode).filter(SsNode.v2_port == Userfirst.user_port).all()
+        NodeList = mysqlsesson.query(VpsNode).filter(VpsNode.v2_port == Userfirst.user_port).all()
         for node in NodeList:
             v2 = V2ray(node.desc, node.server,
                        node.v2_port, node.v2_id, node.v2_alter_id, node.v2_net, node.v2_path)

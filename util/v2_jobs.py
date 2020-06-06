@@ -4,7 +4,8 @@ from init import db, mysqlsesson
 from util import config, v2_util
 from util.schedule_util import schedule_job
 from v2ray.models import Inbound
-from util.mysql_util import Inbound as InboundMysql
+from util.mysql_util import Inbound as InboundMysql, VpsNode
+from util.v2_util import get_ip
 
 __lock = threading.Lock()
 __v2_config_changed = True
@@ -41,6 +42,7 @@ def traffic_job():
             upload = int(traffic.get('uplink', 0))
             download = int(traffic.get('downlink', 0))
             tag = traffic['tag']
+            local_ip = get_ip()
             inbound = Inbound.query.filter_by(tag=tag).first()
             if inbound and download < inbound.down:
                 print("uploadquery:" + inbound.down)
@@ -53,9 +55,16 @@ def traffic_job():
                 mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
                     {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
                     synchronize_session=False)
+                mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
+                    {VpsNode.up: VpsNode.up + upload, VpsNode.down: VpsNode.down + download},
+                    synchronize_session=False)
+
             else:
                 mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
                     {InboundMysql.up: upload, InboundMysql.down: download})
+                mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
+                    {VpsNode.up: upload, VpsNode.down: download})
+
         db.session.commit()
         mysqlsesson.commit()
 

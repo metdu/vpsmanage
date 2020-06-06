@@ -37,8 +37,8 @@ class Inbound(Base):
         self.down = 0
         self.enable = True
 
-class SsNode(Base):
-    __tablename__ = 'ss_node'
+class VpsNode(Base):
+    __tablename__ = 'vps_node'
 
     id = Column(INTEGER(11), primary_key=True)
     user_id = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='用户ID')
@@ -47,11 +47,13 @@ class SsNode(Base):
     group_id = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='所属分组')
     country_code = Column(CHAR(5), nullable=False, server_default=text("'un'"), comment='国家代码')
     server = Column(String(128), server_default=text("''"), comment='服务器域名地址')
+    tag = Column(String(255), nullable=False, server_default=text("''"), comment='端口tag')
     is_subscribe = Column(TINYINT(4), server_default=text("'1'"), comment='是否允许用户订阅该节点：0-否、1-是')
     sort = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='排序值，值越大越靠前显示')
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-维护、1-正常')
     up = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已上传流量，单位字节')
     down = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已下载流量，单位字节')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
     desc = Column(String(255), server_default=text("''"), comment='节点简单描述')
     v2_id = Column(String(255), nullable=False, server_default=text("''"), comment='V2ray id密码')
     v2_alter_id = Column(INTEGER(11), nullable=False, server_default=text("'16'"), comment='V2ray额外ID')
@@ -78,6 +80,7 @@ class SsNode(Base):
         self.desc = desc
         self.v2_path = v2_path
         self.v2_net=v2_net
+        self.tag = 'inbound-%d' % self.v2_port
         self.created_at=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
         self.updated_at=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 class UserSubscribe(Base):
@@ -92,6 +95,7 @@ class UserSubscribe(Base):
     transfer_enable = Column(BIGINT(20), nullable=False, server_default=text("'1099511627776'"), comment='可用流量，单位字节，默认1TiB')
     up = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已上传流量，单位字节')
     down = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已下载流量，单位字节')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
     times = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='地址请求次数')
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-禁用、1-启用')
     ban_desc = Column(String(50, 'utf8mb4_unicode_ci'), nullable=False, server_default=text("''"), comment='封禁理由')
@@ -124,16 +128,18 @@ class VpsDevice(Base):
     country_code = Column(CHAR(5), nullable=False, server_default=text("'un'"), comment='国家代码')
     server = Column(String(128, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='服务器域名地址')
     ip = Column(CHAR(15), server_default=text("''"), comment='服务器IPV4地址')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-不可用、1-可用')
-    def __init__(self, name=None,level=None,country_code=None, server=None):
+    def __init__(self, name=None,level=None,country_code=None, server=None,alllink=None):
         self.name = name
-        self.level = level
         self.level = level
         self.country_code = country_code
         self.server=server
+        self.alllink = alllink
+
 # 初始化数据库连接:
 def conn_mysql():
-    engine = create_engine('mysql+pymysql://lihao:lihao123@149.129.84.249:3306/lihao')
+    engine = create_engine('mysql+pymysql://root:nihao123@67.230.168.201:4306/demo')
     Base.metadata.create_all(engine)
     # 创建DBSession类型:
     DBSession = sessionmaker(bind=engine)
@@ -150,7 +156,7 @@ session.close()
 '''
 def con_mysql(sql):
     import pymysql
-    conn = pymysql.connect(host="149.129.84.249",user ='lihao',password ='lihao123',db='lihao',charset='utf8',port=3306)
+    conn = pymysql.connect(host="67.230.168.201",user ='root',password ='nihao123',db='demo',charset='utf8',port=4306)
     cur = conn.cursor(cursor=pymysql.cursors.DictCursor)
     cur.execute(sql)
     res = cur.fetchall()

@@ -52,6 +52,22 @@ class Inbound(db.Model):
             'level': self.level,
         }
 
+    def to_json_vps(self):
+        return {
+            'id': self.id,
+            'port': self.port,
+            'listen': self.listen,
+            'protocol': self.protocol,
+            'settings': self.settings,
+            'stream_settings': self.stream_settings,
+            'sniffing': self.sniffing,
+            'remark': self.remark,
+            'up': self.up,
+            'down': self.down,
+            'enable': self.enable,
+            'level': self.level,
+        }
+
     def to_v2_json(self):
         return {
             'port': self.port,

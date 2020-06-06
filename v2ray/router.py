@@ -92,14 +92,14 @@ def add_inbound():
     inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
     db.session.add(inbound)
     db.session.commit()
+    local_ip = get_ip()
     if enable == 'true':
         print("更新所有vps")
-        local_ip = get_ip()
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
         inbound.enable = 'false'
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json(), timeout=3)
+                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
         # 插入mysql 用户表,生成订阅
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)

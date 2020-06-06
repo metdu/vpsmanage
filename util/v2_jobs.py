@@ -1,9 +1,10 @@
 import threading
 
-from init import db
+from init import db,mysqlsesson
 from util import config, v2_util
 from util.schedule_util import schedule_job
 from v2ray.models import Inbound
+from util.mysql_util import Inbound as InboundMysql
 
 __lock = threading.Lock()
 __v2_config_changed = True
@@ -40,7 +41,9 @@ def traffic_job():
             download = int(traffic.get('downlink', 0))
             tag = traffic['tag']
             Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
+            InboundMysql.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
         db.session.commit()
+        mysqlsesson.commit()
 
 
 def init():

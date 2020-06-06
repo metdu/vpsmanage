@@ -47,8 +47,8 @@ def traffic_job():
             else:
                 Inbound.query.filter_by(tag=tag).update({'up': upload, 'down': download})
             # 更新mysql
-            inboundmq = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag)
-            if download < inboundmq['down']:
+            inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag)
+            if download < inbounding['down']:
                 mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
                     {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
                     synchronize_session=False)

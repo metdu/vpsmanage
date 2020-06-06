@@ -123,6 +123,7 @@ def get_inbounds_traffic(reset=False):
     cmd = __get_v2ray_api_cmd('', 'StatsService', 'QueryStats', '', 'true' if reset else 'false')
     #print("downoruplinkcmd:"+cmd)
     result, code = cmd_util.exec_cmd(cmd)
+    print("downoruplinkcmd:"+code+result)
     if code != 0:
         logging.warning('v2ray api code %d' % code)
         return None

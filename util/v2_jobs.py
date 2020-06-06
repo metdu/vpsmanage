@@ -41,18 +41,15 @@ def traffic_job():
             upload = int(traffic.get('uplink', 0))
             download = int(traffic.get('downlink', 0))
             tag = traffic['tag']
-            inbound = Inbound.query.filter_by(tag=tag)
-            print("upload:"+upload)
-            print("upload:"+download)
-            print("uploadquery:"+inbound['down'])
-            if inbound and download < inbound['down']:
+            inbound = Inbound.query.filter_by(tag=tag).first()
+            if inbound and download < inbound.down:
+                print("uploadquery:" + inbound.down)
                 Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
             else:
                 Inbound.query.filter_by(tag=tag).update({'up': upload, 'down': download})
             # 更新mysql
-            inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag)
-            print("mqquery:"+inbounding['down'])
-            if inbounding and download < inbounding['down']:
+            inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).first()
+            if inbounding and download < inbounding.down:
                 mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
                     {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
                     synchronize_session=False)

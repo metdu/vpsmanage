@@ -17,7 +17,7 @@ class Inbound(Base):
     protocol = Column(String(50), nullable=False)
     settings = Column(String(500), nullable=False)
     stream_settings = Column(String(500), nullable=False)
-    tag = Column(String(255), nullable=False, unique=True)
+    tag = Column(String(255), nullable=False)
     sniffing = Column(String(200))
     remark = Column(String(255), nullable=False)
     up = Column(BIGINT(20), nullable=False)

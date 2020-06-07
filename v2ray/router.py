@@ -100,12 +100,13 @@ def add_inbound():
         for device in devices:
             if local_ip != device.ip:
                 requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
+                #requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
         # 插入mysql 用户表,生成订阅
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)
 
     # 插入mysql inbound
-    inboundMysql = InboundMysql(port, listen, protocol, newsettings, stream_settings, sniffing, remark)
+    inboundMysql = InboundMysql(local_ip,port, listen, protocol, newsettings, stream_settings, sniffing, remark)
     mysqlsesson.add(inboundMysql)
     # 插入mysql 节点表
     Node = VpsNode(protocol, local_ip, json.loads(settings)['clients'][0]['id'],

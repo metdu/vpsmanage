@@ -128,7 +128,7 @@ def update_inbound(in_id):
     port = request.form.get('port')
     add_if_not_none(update, 'port', port)
     if port:
-        if Inbound.query.filter(and_(Inbound.id != in_id, Inbound.port == port)).count() > 0:
+        if Inbound.query.filter(Inbound.port == port).count() > 1:
             return jsonify(Msg(False, gettext('port exists')))
         add_if_not_none(update, 'tag', 'inbound-' + port)
     add_if_not_none(update, 'listen', request.form.get('listen'))
@@ -154,6 +154,7 @@ def update_inbound(in_id):
     # 当前用户等级
     user_level = request.form['level']
     # 是否更新所有服务器
+    print("vps更新")
     allvps = request.form['allvps']
     inbound = Inbound(int(port), listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
     local_ip = get_ip()
@@ -166,7 +167,7 @@ def update_inbound(in_id):
                               timeout=3)
                 # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
 
-    Inbound.query.filter_by(id=in_id).update(update)
+    Inbound.query.filter_by(port=in_id).update(update)
     db.session.commit()
     return jsonify(
         Msg(True,

@@ -380,7 +380,7 @@
                         allvps:inbound.allvps,
 
                     };
-                    this.submit('/v2ray/inbound/update/' + inbound.id, data, inModal, callback, callback);
+                    this.submit('/v2ray/inbound/update/' + inbound.port, data, inModal, callback, callback);
                 },
                 delInbound(inbound) {
                     this.$confirm({

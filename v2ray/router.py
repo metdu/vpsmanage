@@ -95,7 +95,7 @@ def add_inbound():
     local_ip = get_ip()
     if allvps == 'true':
         print("更新所有vps")
-        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
+        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= int(user_level), VpsDevice.status == 1).all()
         inbound.allvps = 'false'
         for device in devices:
             if local_ip != device.ip:
@@ -160,7 +160,7 @@ def update_inbound(in_id):
     local_ip = get_ip()
     if allvps == "true":
         inbound.allvps = 'false'
-        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
+        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= int(user_level), VpsDevice.status == 1).all()
         for device in devices:
             if local_ip != device.ip:
                 requests.post("http://" + device.ip + ":65432/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),

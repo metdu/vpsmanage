@@ -155,7 +155,8 @@ class VpsDevice(Base):
 
 # 初始化数据库连接:
 def conn_mysql():
-    engine = create_engine('mysql+pymysql://root:nihao123@67.230.168.201:4306/demo')
+    #engine = create_engine('mysql+pymysql://root:nihao123@67.230.168.201:4306/demo')
+    engine = create_engine('mysql+pymysql://lihao:lihao123@149.129.84.249:3306/lihao')
     Base.metadata.create_all(engine)
     # 创建DBSession类型:
     DBSession = sessionmaker(bind=engine)

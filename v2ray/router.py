@@ -154,11 +154,10 @@ def update_inbound(in_id):
     # 当前用户等级
     user_level = request.form['level']
     # 是否更新所有服务器
-    print("vps更新")
     allvps = request.form['allvps']
-    inbound = Inbound(int(port), listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
     local_ip = get_ip()
     if allvps == "true":
+        inbound = Inbound(int(port), listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
         inbound.allvps = 'false'
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= int(user_level), VpsDevice.status == 1).all()
         for device in devices:
@@ -166,7 +165,7 @@ def update_inbound(in_id):
                 requests.post("http://" + device.ip + ":65432/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),
                               timeout=3)
                 # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
-
+    print("vps更新")
     Inbound.query.filter_by(port=in_id).update(update)
     db.session.commit()
     return jsonify(

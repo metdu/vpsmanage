@@ -1,4 +1,2 @@
-#!/bin/sh
-echo "启动Python端"
-cd /var/local/v2master
-nohup python v2-ui.py &
+#!/bin/bash
+/usr/bin/nohup /usr/bin/python /var/local/v2master/v2-ui.py

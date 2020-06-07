@@ -5,7 +5,7 @@ Wants=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/nohup /usr/bin/python3 /var/local/v2master/v2-ui.py &
+ExecStart=/usr/bin/nohup /usr/bin/python /var/local/v2master/v2-ui.py &
 Restart = always
 
 [Install]

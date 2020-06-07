@@ -88,15 +88,15 @@ def add_inbound():
     # 当前用户等级
     user_level = request.form['level']
     # 是否更新所有服务器
-    enable = request.form['enable']
+    allvps = request.form['allvps']
     inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
     db.session.add(inbound)
     db.session.commit()
     local_ip = get_ip()
-    if enable == 'true':
+    if allvps == 'true':
         print("更新所有vps")
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
-        inbound.enable = 'false'
+        inbound.allvps = 'false'
         for device in devices:
             if local_ip != device.ip:
                 requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
@@ -139,28 +139,40 @@ def update_inbound(in_id):
     add_if_not_none(update, 'remark', request.form.get('remark'))
     add_if_not_none(update, 'enable', request.form.get('enable') == 'true')
     add_if_not_none(update, 'level', request.form.get('level'))
-    '''
-        if request.form.get('enable') == 'true':
-        print("删除所有vps")
-        local_ip = get_ip()
-        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= request.form.get('level')).all()
+
+    listen = request.form['listen']
+    protocol = request.form['protocol']
+    settings = request.form['settings']
+    email = random_email()
+    remail = '"email":"' + email + '",'
+    str_list = list(settings)
+    str_list.insert(13, remail)  # 插入堆积
+    newsettings = ''.join(str_list)
+    stream_settings = request.form['stream_settings']
+    sniffing = request.form['sniffing']
+    remark = request.form['remark']
+    # 当前用户等级
+    user_level = request.form['level']
+    # 是否更新所有服务器
+    # 是否更新所有服务器
+    allvps = request.form['allvps']
+    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
+    local_ip = get_ip()
+    if allvps =="true":
+        inbound.allvps = 'false'
+        devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", jsonify(request.form).json, timeout=3)
-        db.session.add(inbound)
-        db.session.commit()
-        # 插入mysql 用户表,生成订阅
-        userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
-        mysqlsesson.add(userSubscribe)
-    '''
+                requests.post("http://" + device.ip + ":65432/v2ray/inbound/update"+in_id, inbound.to_json_vps(), timeout=3)
+                # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
 
     Inbound.query.filter_by(id=in_id).update(update)
     db.session.commit()
     return jsonify(
-        Msg(True,
-            gettext(u'Successfully updated, will take effect within %(seconds)d seconds', seconds=__check_interval)
-            )
-    )
+            Msg(True,
+                gettext(u'Successfully updated, will take effect within %(seconds)d seconds', seconds=__check_interval)
+                )
+        )
 
 
 @v2ray_bp.route('inbound/del/<int:in_id>', methods=['POST'])

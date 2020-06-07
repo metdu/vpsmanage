@@ -537,6 +537,7 @@ class Inbound extends V2CommonClass {
                 remark='',
                 enable=true,
                 level='0',
+                allvps=true,
                 ) {
         super();
         this.port = port;
@@ -549,6 +550,7 @@ class Inbound extends V2CommonClass {
         this.remark = remark;
         this.enable = enable;
         this.level = level;
+        this.allvps=allvps;
     }
 
     reset() {
@@ -562,6 +564,7 @@ class Inbound extends V2CommonClass {
         this.remark = '';
         this.enable = true;
         this.level = '0';
+        this.allvps=true;
     }
 
     genVmessLink(address='') {
@@ -650,7 +653,8 @@ class Inbound extends V2CommonClass {
             Sniffing.fromJson(json.sniffing),
             json.remark,
             json.enable,
-            json.level
+            json.level,
+            json.allvps
         )
     }
 
@@ -670,6 +674,7 @@ class Inbound extends V2CommonClass {
             remark: this.remark,
             enable: this.enable,
             level:this.level,
+            allvps:true.allvps,
         };
     }
 }

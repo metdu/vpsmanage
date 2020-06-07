@@ -360,6 +360,7 @@
                         remark: inbound.remark,
                         level:inbound.level,
                         enable: inbound.enable,
+                        allvps:inbound.allvps,
 
                     };
                     this.submit('/v2ray/inbound/add', data, inModal, callback, callback);
@@ -376,6 +377,7 @@
                         remark: inbound.remark,
                         enable: inbound.enable,
                         level:inbound.level,
+                        allvps:inbound.allvps,
 
                     };
                     this.submit('/v2ray/inbound/update/' + inbound.id, data, inModal, callback, callback);

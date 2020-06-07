@@ -20,6 +20,7 @@ class Inbound(db.Model):
     down = Column(BIGINT, default=0, nullable=False)
     enable = Column(Boolean, default=True, nullable=False)
     level = Column(Integer, nullable=False, default=0)
+    allvps = Column(Boolean, default=True, nullable=False)
 
     def __init__(self, port=None, listen=None, protocol=None,
                  settings=None, stream_settings=None, sniffing=None, remark=None, level=None):
@@ -35,6 +36,7 @@ class Inbound(db.Model):
         self.down = 0
         self.enable = True
         self.level = level
+        self.allvps = True
 
     def to_json(self):
         return {
@@ -50,6 +52,7 @@ class Inbound(db.Model):
             'down': self.down,
             'enable': self.enable,
             'level': self.level,
+            'allvps' : self.allvps
         }
 
     def to_json_vps(self):
@@ -66,6 +69,7 @@ class Inbound(db.Model):
             'down': self.down,
             'enable': self.enable,
             'level': self.level,
+            'allvps': self.allvps
         }
 
     def to_v2_json(self):

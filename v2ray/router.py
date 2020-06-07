@@ -100,13 +100,13 @@ def add_inbound():
         for device in devices:
             if local_ip != device.ip:
                 requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
-                #requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
+                # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
         # 插入mysql 用户表,生成订阅
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)
 
     # 插入mysql inbound
-    inboundMysql = InboundMysql(local_ip,port, listen, protocol, newsettings, stream_settings, sniffing, remark)
+    inboundMysql = InboundMysql(local_ip, port, listen, protocol, newsettings, stream_settings, sniffing, remark)
     mysqlsesson.add(inboundMysql)
     # 插入mysql 节点表
     Node = VpsNode(protocol, local_ip, json.loads(settings)['clients'][0]['id'],
@@ -154,25 +154,25 @@ def update_inbound(in_id):
     # 当前用户等级
     user_level = request.form['level']
     # 是否更新所有服务器
-    # 是否更新所有服务器
     allvps = request.form['allvps']
-    inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
+    inbound = Inbound(int(port), listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
     local_ip = get_ip()
-    if allvps =="true":
+    if allvps == "true":
         inbound.allvps = 'false'
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= user_level, VpsDevice.status == 1).all()
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":65432/v2ray/inbound/update"+in_id, inbound.to_json_vps(), timeout=3)
+                requests.post("http://" + device.ip + ":65432/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),
+                              timeout=3)
                 # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
 
     Inbound.query.filter_by(id=in_id).update(update)
     db.session.commit()
     return jsonify(
-            Msg(True,
-                gettext(u'Successfully updated, will take effect within %(seconds)d seconds', seconds=__check_interval)
-                )
-        )
+        Msg(True,
+            gettext(u'Successfully updated, will take effect within %(seconds)d seconds', seconds=__check_interval)
+            )
+    )
 
 
 @v2ray_bp.route('inbound/del/<int:in_id>', methods=['POST'])

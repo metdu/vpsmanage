@@ -190,10 +190,10 @@ if [ $python_version -gt 2 ];then
   chmod +x /var/local/v2master
  # nohup python3 v2-ui.py &
  python3 v2-ui.py
-#  cp -f v2master.service /etc/systemd/system/
-#    systemctl daemon-reload
-#    systemctl enable v2master
-#    systemctl start v2master
+  cp -f v2master.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable v2master
+    systemctl start v2master
     echo -e "${green}v2master 安装完成，面板已启动，"
     echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
     echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"

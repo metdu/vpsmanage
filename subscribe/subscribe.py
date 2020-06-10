@@ -17,6 +17,9 @@ def subscribe(setting_id):
     if not User:
         return '{code":200,"msg":"不存在该订阅}'
     else:
+        expire_time = V2ray("nextTime:"+str(User.expire_time), "8.8.8.8",
+                       9999,"b5a811d6-c13e-4000-9204-0c45b47e586a", "22","ws", "")
+        shuchu = shuchu + "vmess://" + (base64.b64encode(json.dumps(expire_time.to_json()).encode('utf-8')).decode('ascii')) + '\n'
         NodeList = mysqlsesson.query(VpsNode).filter(VpsNode.v2_port == User.user_port).all()
         for node in NodeList:
             v2 = V2ray(node.desc, node.server,
@@ -24,8 +27,8 @@ def subscribe(setting_id):
             shuchu = shuchu + "vmess://" + (base64.b64encode(json.dumps(v2.to_json()).encode('utf-8')).decode('ascii')) + '\n'
 
     encodestr = base64.b64encode(shuchu.encode('utf-8')).decode('ascii')
-    print(str(encodestr, 'utf-8'))
-    return str(encodestr, 'utf-8')
+    print(encodestr)
+    return encodestr
 
 
 @sub_se.route('/quantumultx/<setting_id>', methods=['GET', 'POST'])
@@ -35,6 +38,12 @@ def subscribeqx(setting_id):
     if not Userfirst:
         return '{code":200,"msg":"不存在该订阅}'
     else:
+        expire_time =  V2ray("nextTime:"+str(Userfirst.expire_time), "8.8.8.8",
+                       9999,"b5a811d6-c13e-4000-9204-0c45b47e586a", "22","ws", "")
+        openurl = "vmess=" + expire_time.add + ":" + str(expire_time.port) + ", method=chacha20-ietf-poly1305, password=" \
+                  + expire_time.id + ", obfs=" + expire_time.net + ", obfs-uri=" + expire_time.path \
+                  + ",fast-open=false, udp-relay=false, tag=" + expire_time.ps
+        shuchu = shuchu + openurl + "\n"
         NodeList = mysqlsesson.query(VpsNode).filter(VpsNode.v2_port == Userfirst.user_port).all()
         for node in NodeList:
             v2 = V2ray(node.desc, node.server,

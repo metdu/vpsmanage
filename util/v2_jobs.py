@@ -1,9 +1,11 @@
 import threading
 
-from init import db
+from init import db, mysqlsesson
 from util import config, v2_util
 from util.schedule_util import schedule_job
 from v2ray.models import Inbound
+from util.mysql_util import Inbound as InboundMysql, VpsNode
+from util.v2_util import get_ip
 
 __lock = threading.Lock()
 __v2_config_changed = True
@@ -15,6 +17,7 @@ def v2_config_change(func):
         result = func(*args, **kwargs)
         __v2_config_changed = True
         return result
+
     inner.__name__ = func.__name__
     return inner
 
@@ -39,8 +42,31 @@ def traffic_job():
             upload = int(traffic.get('uplink', 0))
             download = int(traffic.get('downlink', 0))
             tag = traffic['tag']
-            Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
+            local_ip = get_ip()
+            inbound = Inbound.query.filter_by(tag=tag).first()
+            if inbound and download < inbound.down:
+                print("uploadquery:" + inbound.down)
+                Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
+            else:
+                Inbound.query.filter_by(tag=tag).update({'up': upload, 'down': download})
+            # 更新mysql
+            inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).first()
+            if inbounding and download < inbounding.down:
+                mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
+                    {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
+                    synchronize_session=False)
+                mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
+                    {VpsNode.up: VpsNode.up + upload, VpsNode.down: VpsNode.down + download},
+                    synchronize_session=False)
+
+            else:
+                mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
+                    {InboundMysql.up: upload, InboundMysql.down: download})
+                mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
+                    {VpsNode.up: upload, VpsNode.down: download})
+
         db.session.commit()
+        mysqlsesson.commit()
 
 
 def init():

@@ -4,6 +4,7 @@ from sqlalchemy.dialects.mysql import BIGINT, CHAR, INTEGER, TINYINT
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import time
+
 # 创建对象的基类:
 Base = declarative_base()
 
@@ -12,19 +13,22 @@ class Inbound(Base):
     __tablename__ = 'inbound'
 
     id = Column(INTEGER(11), primary_key=True)
-    port = Column(INTEGER(11), nullable=False, unique=True)
+    server = Column(String(128), server_default=text("''"), comment='服务器域名地址')
+    port = Column(INTEGER(11), nullable=False)
     listen = Column(String(50))
     protocol = Column(String(50), nullable=False)
     settings = Column(String(500), nullable=False)
     stream_settings = Column(String(500), nullable=False)
-    tag = Column(String(255), nullable=False, unique=True)
+    tag = Column(String(255), nullable=False)
     sniffing = Column(String(200))
     remark = Column(String(255), nullable=False)
     up = Column(BIGINT(20), nullable=False)
     down = Column(BIGINT(20), nullable=False)
     enable = Column(INTEGER(11), nullable=False)
-    def __init__(self, port=None, listen=None, protocol=None,
+
+    def __init__(self, server=None, port=None, listen=None, protocol=None,
                  settings=None, stream_settings=None, sniffing=None, remark=None):
+        self.server = server
         self.port = port
         self.listen = listen
         self.protocol = protocol
@@ -37,21 +41,24 @@ class Inbound(Base):
         self.down = 0
         self.enable = True
 
-class SsNode(Base):
-    __tablename__ = 'ss_node'
+
+class VpsNode(Base):
+    __tablename__ = 'vps_node'
 
     id = Column(INTEGER(11), primary_key=True)
     user_id = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='用户ID')
-    type =Column(String(8), nullable=False, server_default=text("'V2ray'"), comment='服务类型：SS、V2ray')
+    type = Column(String(8), nullable=False, server_default=text("'V2ray'"), comment='服务类型：SS、V2ray')
     name = Column(String(128), nullable=False, server_default=text("''"), comment='名称')
     group_id = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='所属分组')
     country_code = Column(CHAR(5), nullable=False, server_default=text("'un'"), comment='国家代码')
     server = Column(String(128), server_default=text("''"), comment='服务器域名地址')
+    tag = Column(String(255), nullable=False, server_default=text("''"), comment='端口tag')
     is_subscribe = Column(TINYINT(4), server_default=text("'1'"), comment='是否允许用户订阅该节点：0-否、1-是')
     sort = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='排序值，值越大越靠前显示')
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-维护、1-正常')
     up = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已上传流量，单位字节')
     down = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已下载流量，单位字节')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
     desc = Column(String(255), server_default=text("''"), comment='节点简单描述')
     v2_id = Column(String(255), nullable=False, server_default=text("''"), comment='V2ray id密码')
     v2_alter_id = Column(INTEGER(11), nullable=False, server_default=text("'16'"), comment='V2ray额外ID')
@@ -62,24 +69,30 @@ class SsNode(Base):
     v2_host = Column(String(255), nullable=False, server_default=text("''"), comment='V2ray伪装的域名')
     v2_path = Column(String(255), nullable=False, server_default=text("''"), comment='V2ray WS/H2路径')
     v2_tls = Column(TINYINT(4), nullable=False, server_default=text("'0'"), comment='V2ray底层传输安全 0 未开启 1 开启')
-    v2_insider_port = Column(INTEGER(11), nullable=False, server_default=text("'10550'"), comment='V2ray内部端口（内部监听），v2_port为0时有效')
-    v2_outsider_port = Column(INTEGER(11), nullable=False, server_default=text("'443'"), comment='V2ray外部端口（外部覆盖），v2_port为0时有效')
+    v2_insider_port = Column(INTEGER(11), nullable=False, server_default=text("'10550'"),
+                             comment='V2ray内部端口（内部监听），v2_port为0时有效')
+    v2_outsider_port = Column(INTEGER(11), nullable=False, server_default=text("'443'"),
+                              comment='V2ray外部端口（外部覆盖），v2_port为0时有效')
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
-    def __init__(self, type=None, server=None, v2_id=None,v2_alter_id=None,
-                 v2_port=None, v2_path=None, desc=None,v2_net=None):
+
+    def __init__(self, type=None, server=None, v2_id=None, v2_alter_id=None,
+                 v2_port=None, v2_path=None, desc=None, v2_net=None):
         self.type = type
         self.server = server
-        self.v2_id=v2_id
+        self.v2_id = v2_id
         self.v2_alter_id = v2_alter_id
         self.v2_port = v2_port
         self.v2_method = 'auto'
         self.v2_host = server
         self.desc = desc
         self.v2_path = v2_path
-        self.v2_net=v2_net
-        self.created_at=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-        self.updated_at=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+        self.v2_net = v2_net
+        self.tag = 'inbound-%d' % self.v2_port
+        self.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        self.updated_at = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
+
 class UserSubscribe(Base):
     __tablename__ = 'user_subscribe'
     id = Column(INTEGER(11), primary_key=True)
@@ -89,15 +102,18 @@ class UserSubscribe(Base):
     code = Column(String(200), nullable=False, server_default=text("''"), comment='订阅地址唯一识别码')
     user_port = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='用户使用的V2ray端口')
     fq_text = Column(Text)
-    transfer_enable = Column(BIGINT(20), nullable=False, server_default=text("'1099511627776'"), comment='可用流量，单位字节，默认1TiB')
+    transfer_enable = Column(BIGINT(20), nullable=False, server_default=text("'1099511627776'"),
+                             comment='可用流量，单位字节，默认1TiB')
     up = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已上传流量，单位字节')
     down = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已下载流量，单位字节')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
     times = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='地址请求次数')
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-禁用、1-启用')
     ban_desc = Column(String(50, 'utf8mb4_unicode_ci'), nullable=False, server_default=text("''"), comment='封禁理由')
     wechat = Column(String(30, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='微信')
     qq = Column(String(20, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='QQ')
-    usage = Column(String(10, 'utf8mb4_unicode_ci'), nullable=False, server_default=text("'4'"), comment='用途：1-手机、2-电脑、3-路由器、4-其他')
+    usage = Column(String(10, 'utf8mb4_unicode_ci'), nullable=False, server_default=text("'4'"),
+                   comment='用途：1-手机、2-电脑、3-路由器、4-其他')
     pay_way = Column(TINYINT(4), nullable=False, server_default=text("'0'"), comment='付费方式：0-免费、1-季付、2-月付、3-半年付、4-年付')
     balance = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='余额，单位分')
     enable_time = Column(Date, comment='开通日期')
@@ -108,13 +124,15 @@ class UserSubscribe(Base):
     traffic_reset_day = Column(TINYINT(4), nullable=False, server_default=text("'0'"), comment='流量自动重置日，0表示不重置')
     created_at = Column(DateTime, comment='创建时间')
     updated_at = Column(DateTime, comment='最后更新时间')
-    def __init__(self, code=None,user_port=None,level=None, is_admin=None):
+
+    def __init__(self, code=None, user_port=None, level=None, is_admin=None):
         self.code = code
         self.user_port = user_port
         self.level = level
         self.is_admin = is_admin
-        self.created_at=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-        self.updated_at=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+        self.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        self.updated_at = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
 
 class VpsDevice(Base):
     __tablename__ = 'vps_device'
@@ -124,21 +142,28 @@ class VpsDevice(Base):
     country_code = Column(CHAR(5), nullable=False, server_default=text("'un'"), comment='国家代码')
     server = Column(String(128, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='服务器域名地址')
     ip = Column(CHAR(15), server_default=text("''"), comment='服务器IPV4地址')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-不可用、1-可用')
-    def __init__(self, name=None,level=None,country_code=None, server=None):
+
+    def __init__(self, name=None, level=None, country_code=None, server=None, alllink=None):
         self.name = name
         self.level = level
-        self.level = level
         self.country_code = country_code
-        self.server=server
+        self.server = server
+        self.alllink = alllink
+
+
 # 初始化数据库连接:
 def conn_mysql():
+    #engine = create_engine('mysql+pymysql://root:nihao123@67.230.168.201:4306/demo')
     engine = create_engine('mysql+pymysql://lihao:lihao123@149.129.84.249:3306/lihao')
     Base.metadata.create_all(engine)
     # 创建DBSession类型:
     DBSession = sessionmaker(bind=engine)
-    session=DBSession()
+    session = DBSession()
     return session
+
+
 '''
 user = session.query(User).filter(User.id=='6').one()
 # 打印类型和对象的name属性:
@@ -148,9 +173,12 @@ print('name:', user.source)
 # 关闭Session:
 session.close()
 '''
+
+
 def con_mysql(sql):
     import pymysql
-    conn = pymysql.connect(host="149.129.84.249",user ='lihao',password ='lihao123',db='lihao',charset='utf8',port=3306)
+    conn = pymysql.connect(host="67.230.168.201", user='root', password='nihao123', db='demo', charset='utf8',
+                           port=4306)
     cur = conn.cursor(cursor=pymysql.cursors.DictCursor)
     cur.execute(sql)
     res = cur.fetchall()

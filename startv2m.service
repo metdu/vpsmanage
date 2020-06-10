@@ -1,0 +1,11 @@
+[Unit]
+Description = startv2mpython
+After=network.target
+After=network-online.target
+Wants=network-online.target
+[Service]
+ExecStart =/usr/bin/nohup /var/local/v2master/startv2m.sh &
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

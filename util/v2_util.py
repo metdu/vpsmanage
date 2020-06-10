@@ -121,7 +121,7 @@ def get_inbounds_traffic(reset=False):
         logging.warning('v2ray api port is not configured')
         return None
     cmd = __get_v2ray_api_cmd('', 'StatsService', 'QueryStats', '', 'true' if reset else 'false')
-    print("downoruplinkcmd:"+cmd)
+    #print("downoruplinkcmd:"+cmd)
     result, code = cmd_util.exec_cmd(cmd)
     if code != 0:
         logging.warning('v2ray api code %d' % code)

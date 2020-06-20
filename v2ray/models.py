@@ -20,7 +20,7 @@ class Inbound(db.Model):
     down = Column(BIGINT, default=0, nullable=False)
     enable = Column(Boolean, default=True, nullable=False)
     level = Column(Integer, nullable=False, default=0)
-    allvps = Column(Boolean, default=True, nullable=False)
+    allvps = Column(String(10), default='false')
 
     def __init__(self, port=None, listen=None, protocol=None,
                  settings=None, stream_settings=None, sniffing=None, remark=None, level=None):
@@ -36,7 +36,7 @@ class Inbound(db.Model):
         self.down = 0
         self.enable = True
         self.level = level
-        self.allvps = True
+        self.allvps = 'false'
 
     def to_json(self):
         return {

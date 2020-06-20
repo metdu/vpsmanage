@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import CHAR, Column, Date, DateTime, Index, String, TIMESTAMP, Text, text, create_engine
-from sqlalchemy.dialects.mysql import BIGINT, CHAR, INTEGER, TINYINT
+from sqlalchemy.dialects.mysql import BIGINT, CHAR, INTEGER, TINYINT,LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import time
@@ -8,6 +8,27 @@ import time
 # 创建对象的基类:
 Base = declarative_base()
 
+class FailedNodeJob(Base):
+    __tablename__ = 'failed_node_jobs'
+    __table_args__ = {'comment': '失败任务'}
+
+    id = Column(BIGINT(20), primary_key=True)
+    create_ip = Column(String(128, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='创建任务ip')
+    destnation_ip = Column(String(128, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='需要执行任务服务器域名地址')
+    server = Column(String(128, 'utf8mb4_unicode_ci'), server_default=text("''"), comment='请求服务器域名地址')
+    json = Column(String(1000), nullable=False)
+    count = Column(INTEGER(11), nullable=False, server_default=text("'0'"), comment='job执行次数')
+    failed_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-删除、1-待执行')
+    def __init__(self, create_ip=None, destnation_ip=None, server=None, json=None):
+        self.server = server
+        self.create_ip = create_ip
+        self.destnation_ip = destnation_ip
+        self.server = server
+        self.json = json
+        self.count = 0
+        self.failed_at = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        self.status = 1
 
 class Inbound(Base):
     __tablename__ = 'inbound'

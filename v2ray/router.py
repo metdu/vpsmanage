@@ -11,7 +11,7 @@ from util.v2_jobs import v2_config_change
 from v2ray.models import Inbound
 # from v2ray.modelsmysql import InboundMysql
 from init import mysqlsesson
-from util.mysql_util import Inbound as InboundMysql, VpsNode, UserSubscribe, VpsDevice
+from util.mysql_util import Inbound as InboundMysql, VpsNode, UserSubscribe, VpsDevice,FailedNodeJob
 from util.v2_util import random_email, get_ip
 import base64
 import requests
@@ -99,8 +99,12 @@ def add_inbound():
         inbound.allvps = 'false'
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":65432/v2ray/inbound/add", inbound.to_json_vps(), timeout=13)
-                # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
+                try:
+                    requests.post("http://" + device.ip + ":"+str(config.get_port())+"/v2ray/inbound/add", inbound.to_json_vps(), timeout=13)
+                except:
+                    print("Failed http")
+                    mysqlsesson.add(FailedNodeJob(local_ip,device.ip,"http://" + device.ip + ":"+str(config.get_port())+"/v2ray/inbound/add", str(inbound.to_json_vps())))
+        # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
         # 插入mysql 用户表,生成订阅
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)
@@ -162,7 +166,7 @@ def update_inbound(in_id):
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= int(user_level), VpsDevice.status == 1).all()
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":65432/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),
+                requests.post("http://" + device.ip + ":"+config.get_port()+"/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),
                               timeout=3)
                 # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
     print("vps更新")

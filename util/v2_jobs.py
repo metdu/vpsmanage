@@ -4,8 +4,9 @@ from init import db, mysqlsesson
 from util import config, v2_util
 from util.schedule_util import schedule_job
 from v2ray.models import Inbound
-from util.mysql_util import Inbound as InboundMysql, VpsNode
+from util.mysql_util import Inbound as InboundMysql, VpsNode,FailedNodeJob
 from util.v2_util import get_ip
+import requests
 
 __lock = threading.Lock()
 __v2_config_changed = True
@@ -45,14 +46,13 @@ def traffic_job():
             local_ip = get_ip()
             inbound = Inbound.query.filter_by(tag=tag).first()
             if inbound and download < inbound.down:
-                print("uploadquery:" + inbound.down)
                 Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
             else:
                 Inbound.query.filter_by(tag=tag).update({'up': upload, 'down': download})
             # 更新mysql
             inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).first()
             if inbounding and download < inbounding.down:
-                mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
+                mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag,InboundMysql.server == local_ip).update(
                     {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
                     synchronize_session=False)
                 mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
@@ -60,15 +60,48 @@ def traffic_job():
                     synchronize_session=False)
 
             else:
-                mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).update(
+                mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag,InboundMysql.server == local_ip).update(
                     {InboundMysql.up: upload, InboundMysql.down: download})
                 mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
                     {VpsNode.up: upload, VpsNode.down: download})
 
         db.session.commit()
         mysqlsesson.commit()
-
-
+#创建节点任务
+def create_node_job():
+    with __lock:
+        if not v2_util.is_running():
+            return
+        failedNodeJobs = mysqlsesson.query(FailedNodeJob).filter(FailedNodeJob.count<20,FailedNodeJob.status==1)
+        if not failedNodeJobs:
+            return
+        for nodejob in failedNodeJobs:
+            try:
+                requests.post(nodejob.server,nodejob.json, timeout=13)
+            except:
+                print("Failed http")
+                mysqlsesson.query(FailedNodeJob).filter(FailedNodeJob.id == nodejob.id).update(
+                    {FailedNodeJob.count: nodejob.count+1})
+            else:mysqlsesson.query(FailedNodeJob).filter(FailedNodeJob.id == nodejob.id).update(
+                    {FailedNodeJob.count: nodejob.count+1,FailedNodeJob.status:0})
+        mysqlsesson.commit()
+#单节点流量统计订阅总流量任务
+def check_traffic_job():
+    with __lock:
+        if not v2_util.is_running():
+            return
+        local_ip = get_ip()
+        vpsNode = mysqlsesson.query(VpsNode).filter(VpsNode.server == local_ip)
+        for node in vpsNode:
+            if node.ip+node.down >= node.alllink:
+                mysqlsesson.query(VpsNode).filter(VpsNode.tag == node.tag, VpsNode.server == local_ip).update(
+                    {VpsNode.status: 0, VpsNode.is_subscribe: 0})
+                Inbound.query.filter_by(tag=node.tag).update({'enable': False})
+        db.session.commit()
+        mysqlsesson.commit()
 def init():
     schedule_job(check_v2_config_job, config.get_v2_config_check_interval())
     schedule_job(traffic_job, config.get_traffic_job_interval())
+    schedule_job(create_node_job, 300)
+    schedule_job(check_traffic_job, 300)
+

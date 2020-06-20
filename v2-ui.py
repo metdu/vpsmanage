@@ -68,7 +68,7 @@ if __name__ == '__main__':
             if len(sys.argv) > 2:
                 port = sys.argv[2]
             else:
-                port = 65432
+                port = 8085
             config.update_setting_by_key('port', port)
             print('Set port to ' + port + ' successfully')
         else:

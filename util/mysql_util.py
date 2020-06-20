@@ -79,7 +79,7 @@ class VpsNode(Base):
     status = Column(TINYINT(4), nullable=False, server_default=text("'1'"), comment='状态：0-维护、1-正常')
     up = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已上传流量，单位字节')
     down = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='已下载流量，单位字节')
-    alllink = Column(BIGINT(20), nullable=False, server_default=text("'0'"), comment='总流量，单位字节')
+    alllink = Column(BIGINT(20), nullable=False, server_default=text("'107374182400'"), comment='总流量，单位字节')
     desc = Column(String(255), server_default=text("''"), comment='节点简单描述')
     v2_id = Column(String(255), nullable=False, server_default=text("''"), comment='V2ray id密码')
     v2_alter_id = Column(INTEGER(11), nullable=False, server_default=text("'16'"), comment='V2ray额外ID')

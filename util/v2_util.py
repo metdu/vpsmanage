@@ -12,7 +12,8 @@ import urllib.request
 from util import config, list_util, cmd_util, server_info, file_util
 from v2ray.exceptions import V2rayException
 from v2ray.models import Inbound
-
+from init import db, mysqlsesson
+from util.mysql_util import Inbound as InboundMysql, VpsNode
 
 class Protocols(Enum):
     VMESS = 'vmess'
@@ -71,6 +72,7 @@ def is_running():
 def restart(now=False):
     def f():
         cmd_util.exec_cmd(config.get_v2_restart_cmd())
+
     if now:
         f()
     else:
@@ -83,6 +85,7 @@ def start():
 
     def f():
         cmd_util.exec_cmd(config.get_v2_start_cmd())
+
     Timer(3, f).start()
 
 
@@ -92,6 +95,7 @@ def stop():
 
     def f():
         cmd_util.exec_cmd(config.get_v2_stop_cmd())
+
     Timer(3, f).start()
 
 
@@ -106,12 +110,11 @@ except Exception as e:
 __traffic_pattern = re.compile('stat:\s*<\s*name:\s*"inbound>>>'
                                '(?P<tag>[^>]+)>>>traffic>>>(?P<type>uplink|downlink)"(\s*value:\s*(?P<value>\d+))?')
 
-
 __v2ctl_cmd = config.get_v2ctl_cmd_path()
 
 
 def __get_v2ray_api_cmd(address, service, method, pattern, reset):
-    cmd = '%s api --server=%s:%d %s.%s \'pattern: "%s" reset: %s\''\
+    cmd = '%s api --server=%s:%d %s.%s \'pattern: "%s" reset: %s\'' \
           % (__v2ctl_cmd, address, __api_port, service, method, pattern, reset)
     return cmd
 
@@ -121,14 +124,14 @@ def get_inbounds_traffic(reset=False):
         logging.warning('v2ray api port is not configured')
         return None
     cmd = __get_v2ray_api_cmd('', 'StatsService', 'QueryStats', '', 'true' if reset else 'false')
-    #print(cmd)
+    # print(cmd)
     result, code = cmd_util.exec_cmd(cmd)
     if code != 0:
         logging.warning('v2ray api code %d' % code)
         print('v2ray api code %d' % code)
         return None
     inbounds = []
-    #print('流量结果'+result)
+    # print('流量结果'+result)
     for match in __traffic_pattern.finditer(result):
         tag = match.group('tag')
         tag = codecs.getdecoder('unicode_escape')(tag)[0]
@@ -149,13 +152,46 @@ def get_inbounds_traffic(reset=False):
                 'tag': tag,
                 _type: value
             })
+    for traffic in inbounds:
+        upload = int(traffic.get('uplink', 0))
+        download = int(traffic.get('downlink', 0))
+        print("down:" + download + ":up:" + upload)
+        tag = traffic['tag']
+        local_ip = get_ip()
+        inbound = Inbound.query.filter_by(tag=tag).first()
+        if inbound and download < inbound.down:
+            Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
+        else:
+            Inbound.query.filter_by(tag=tag).update({'up': upload, 'down': download})
+        # 更新mysql
+        inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).first()
+        if inbounding and download < inbounding.down:
+            mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag, InboundMysql.server == local_ip).update(
+                {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
+                synchronize_session=False)
+            mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
+                {VpsNode.up: VpsNode.up + upload, VpsNode.down: VpsNode.down + download},
+                synchronize_session=False)
 
+        else:
+            mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag, InboundMysql.server == local_ip).update(
+                {InboundMysql.up: upload, InboundMysql.down: download},
+                synchronize_session=False)
+            mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
+                {VpsNode.up: upload, VpsNode.down: download},
+                synchronize_session=False)
+
+    db.session.commit()
+    mysqlsesson.commit()
+    print(inbounds)
     return inbounds
+
 
 def random_email():
     domain = ['163', 'qq', 'sina', '126', 'gmail', 'outlook', 'icloud']
     core_email = "@{}.com".format(random.choice(domain))
     return ''.join(random.sample(string.ascii_letters + string.digits, 8)) + core_email
+
 
 def get_ip():
     """

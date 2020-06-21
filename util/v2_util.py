@@ -149,6 +149,8 @@ def get_inbounds_traffic(reset=False):
                 'tag': tag,
                 _type: value
             })
+
+    print(inbounds)
     return inbounds
 
 def random_email():

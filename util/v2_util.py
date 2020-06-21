@@ -152,37 +152,6 @@ def get_inbounds_traffic(reset=False):
                 'tag': tag,
                 _type: value
             })
-    for traffic in inbounds:
-        upload = int(traffic.get('uplink', 0))
-        download = int(traffic.get('downlink', 0))
-        print("down:" + download + ":up:" + upload)
-        tag = traffic['tag']
-        local_ip = get_ip()
-        inbound = Inbound.query.filter_by(tag=tag).first()
-        if inbound and download < inbound.down:
-            Inbound.query.filter_by(tag=tag).update({'up': Inbound.up + upload, 'down': Inbound.down + download})
-        else:
-            Inbound.query.filter_by(tag=tag).update({'up': upload, 'down': download})
-        # 更新mysql
-        inbounding = mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag).first()
-        if inbounding and download < inbounding.down:
-            mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag, InboundMysql.server == local_ip).update(
-                {InboundMysql.up: InboundMysql.up + upload, InboundMysql.down: InboundMysql.down + download},
-                synchronize_session=False)
-            mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
-                {VpsNode.up: VpsNode.up + upload, VpsNode.down: VpsNode.down + download},
-                synchronize_session=False)
-
-        else:
-            mysqlsesson.query(InboundMysql).filter(InboundMysql.tag == tag, InboundMysql.server == local_ip).update(
-                {InboundMysql.up: upload, InboundMysql.down: download},
-                synchronize_session=False)
-            mysqlsesson.query(VpsNode).filter(VpsNode.tag == tag, VpsNode.server == local_ip).update(
-                {VpsNode.up: upload, VpsNode.down: download},
-                synchronize_session=False)
-
-    db.session.commit()
-    mysqlsesson.commit()
     print(inbounds)
     return inbounds
 

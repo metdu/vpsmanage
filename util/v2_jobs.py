@@ -39,7 +39,8 @@ def traffic_job():
     # with __lock:
     # if not v2_util.is_running():
     #    return
-    traffics = v2_util.get_inbounds_traffic()
+    v2_util.get_inbounds_traffic()
+    '''
     print("流量"+traffics)
     if not traffics:
         print("没查到流量")
@@ -75,6 +76,8 @@ def traffic_job():
 
     db.session.commit()
     mysqlsesson.commit()
+    '''
+
 
 
 # 创建节点任务

@@ -7,8 +7,7 @@ from v2ray.models import Inbound
 from util.mysql_util import Inbound as InboundMysql, VpsNode, FailedNodeJob
 from util.v2_util import get_ip
 import requests
-from apscheduler.schedulers.blocking import BlockingScheduler
-
+from apscheduler.schedulers.background import BackgroundScheduler
 __lock = threading.Lock()
 __v2_config_changed = True
 
@@ -110,7 +109,7 @@ def check_traffic_job():
 
 def dojob():
     # 创建调度器：BlockingScheduler
-    scheduler = BlockingScheduler()
+    scheduler = BackgroundScheduler()
     # 添加任务,时间间隔2S
     scheduler.add_job(check_v2_config_job, 'interval', seconds=10, id='test_job1')
     # 添加任务,时间间隔5S

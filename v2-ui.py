@@ -10,7 +10,7 @@ from tornado import web, wsgi
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
-from init import app, BASE_DIR
+from init import app, BASE_DIR,init_v2_jobs
 from util import config
 
 
@@ -51,6 +51,7 @@ def main():
     http_server.listen(config.get_port(), config.get_address())
     print("Start success on port %d" % config.get_port())
     IOLoop.current().start()
+    init_v2_jobs()
 
 
 if __name__ == '__main__':

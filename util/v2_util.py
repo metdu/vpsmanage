@@ -125,8 +125,10 @@ def get_inbounds_traffic(reset=False):
     result, code = cmd_util.exec_cmd(cmd)
     if code != 0:
         logging.warning('v2ray api code %d' % code)
+        print('v2ray api code %d' % code)
         return None
     inbounds = []
+    print('流量结果'+result)
     for match in __traffic_pattern.finditer(result):
         tag = match.group('tag')
         tag = codecs.getdecoder('unicode_escape')(tag)[0]

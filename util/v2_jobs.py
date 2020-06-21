@@ -27,7 +27,7 @@ def v2_config_change(func):
 def check_v2_config_job():
     global __v2_config_changed
     if __v2_config_changed:
-        with __lock:
+        #with __lock:
             v2_config = v2_util.gen_v2_config_from_db()
             v2_util.write_v2_config(v2_config)
             __v2_config_changed = False

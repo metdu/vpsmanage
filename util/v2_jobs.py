@@ -107,7 +107,7 @@ def check_traffic_job():
         local_ip = get_ip()
         vpsNode = mysqlsesson.query(VpsNode).filter(VpsNode.server == local_ip)
         for node in vpsNode:
-            if node.ip + node.down >= node.alllink:
+            if node.up + node.down >= node.alllink:
                 mysqlsesson.query(VpsNode).filter(VpsNode.tag == node.tag, VpsNode.server == local_ip).update(
                     {VpsNode.status: 0, VpsNode.is_subscribe: 0})
                 Inbound.query.filter_by(tag=node.tag).update({'enable': False})

@@ -153,6 +153,8 @@ def get_inbounds_traffic(reset=False):
                 _type: value
             })
     print(inbounds)
+    for kk in inbounds:
+        print(kk.tag)
     return inbounds
 
 

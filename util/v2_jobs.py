@@ -46,7 +46,7 @@ def traffic_job():
     for traffic in traffics:
         upload = int(traffic.get('uplink', 0))
         download = int(traffic.get('downlink', 0))
-        print("down:" + download + ":up:" + upload)
+        print("down:" + str(download) + ":up:" + str(upload))
         tag = traffic['tag']
         local_ip = get_ip()
         inbound = Inbound.query.filter_by(tag=tag).first()

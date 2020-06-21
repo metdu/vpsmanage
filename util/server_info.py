@@ -150,4 +150,4 @@ def net():
     __last_net_io = cur_net_io
 
 
-schedule_job(refresh_status, 2)
+#schedule_job(refresh_status, 2)

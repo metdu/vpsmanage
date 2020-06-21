@@ -33,6 +33,7 @@ def check_v2_config_job():
 
 
 def traffic_job():
+    print("进入流量统计")
     with __lock:
         if not v2_util.is_running():
             return
@@ -69,6 +70,7 @@ def traffic_job():
         mysqlsesson.commit()
 #创建节点任务
 def create_node_job():
+        print("进入创建节点")
         if not v2_util.is_running():
             return
         failedNodeJobs = mysqlsesson.query(FailedNodeJob).filter(FailedNodeJob.count<20,FailedNodeJob.status==1)
@@ -86,6 +88,7 @@ def create_node_job():
         mysqlsesson.commit()
 #单节点流量统计订阅总流量任务
 def check_traffic_job():
+        print("进入节点流量统计:")
         if not v2_util.is_running():
             return
         local_ip = get_ip()

@@ -119,11 +119,11 @@ def dojob():
     # 添加任务,时间间隔2S
     scheduler.add_job(check_v2_config_job, 'interval', seconds=10, id='test_job1')
     # 添加任务,时间间隔5S
-    scheduler.add_job(traffic_job, 'interval', seconds=13, id='test_job2')
+    scheduler.add_job(traffic_job, 'interval', seconds=20, id='test_job2')
     # 添加任务,时间间隔2S
-    scheduler.add_job(create_node_job, 'interval', seconds=17, id='test_job3')
+    scheduler.add_job(create_node_job, 'interval', seconds=100, id='test_job3')
     # 添加任务,时间间隔5S
-    scheduler.add_job(check_traffic_job, 'interval', seconds=30, id='test_job4')
+    scheduler.add_job(check_traffic_job, 'interval', seconds=200, id='test_job4')
     # 添加任务,时间间隔5S
     scheduler.add_job(server_info.refresh_status, 'interval', seconds=2, id='test_job5')
     scheduler.start()

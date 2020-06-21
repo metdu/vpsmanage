@@ -166,7 +166,7 @@ def update_inbound(in_id):
         devices = mysqlsesson.query(VpsDevice).filter(VpsDevice.level <= int(user_level), VpsDevice.status == 1).all()
         for device in devices:
             if local_ip != device.ip:
-                requests.post("http://" + device.ip + ":"+config.get_port()+"/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),
+                requests.post("http://" + device.ip + ":"+str(config.get_port())+"/v2ray/inbound/update/" + str(in_id), inbound.to_json_vps(),
                               timeout=3)
                 # requests.post("http://127.0.0.1:5000/v2ray/inbound/add", inbound.to_json_vps(), timeout=3)
     print("vps更新")

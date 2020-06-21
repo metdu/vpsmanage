@@ -121,14 +121,14 @@ def get_inbounds_traffic(reset=False):
         logging.warning('v2ray api port is not configured')
         return None
     cmd = __get_v2ray_api_cmd('', 'StatsService', 'QueryStats', '', 'true' if reset else 'false')
-    print(cmd)
+    #print(cmd)
     result, code = cmd_util.exec_cmd(cmd)
     if code != 0:
         logging.warning('v2ray api code %d' % code)
         print('v2ray api code %d' % code)
         return None
     inbounds = []
-    print('流量结果'+result)
+    #print('流量结果'+result)
     for match in __traffic_pattern.finditer(result):
         tag = match.group('tag')
         tag = codecs.getdecoder('unicode_escape')(tag)[0]

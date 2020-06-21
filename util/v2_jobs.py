@@ -41,6 +41,7 @@ def traffic_job():
     #    return
     traffics = v2_util.get_inbounds_traffic()
     if not traffics:
+        print("没查到流量")
         return
     for traffic in traffics:
         upload = int(traffic.get('uplink', 0))

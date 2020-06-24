@@ -171,7 +171,35 @@ docker_install
 }
 
 install_master(){
-  systemctl stop v2master
+  if [[ x"${release}" == x"centos" ]]; then
+ systemctl stop startv2m
+  python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
+if [ $python_version -gt 2 ];then
+  echo "已安装Python3"
+  yum install -y  vim python3-pip git
+  pip3 install --upgrade pip
+  pip install flask tornado
+  cd /var/local
+  mkdir v2master
+  cd v2master
+  git init
+  git pull  https://github.com/available2099/vpsmanage.git
+  git remote add upstream https://github.com/available2099/vpsmanage.git
+  git fetch upstream
+  pip install --no-cache-dir -r requirements.txt
+  chmod +x /var/local/v2master/startv2m.sh
+ # nohup python3 v2-ui.py &
+ python v2-ui.py
+  cp -f startv2m.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable startv2m
+    systemctl start startv2m
+    echo -e "${green}v2master 安装完成，面板已启动，"
+    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
+    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
+    echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
+elif [[ x"${release}" == x"ubuntu" ]]; then
+    systemctl stop startv2m
   python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
 if [ $python_version -gt 2 ];then
   echo "已安装Python3"
@@ -198,6 +226,36 @@ if [ $python_version -gt 2 ];then
     echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
     echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
     echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
+elif [[ x"${release}" == x"debian" ]]; then
+ systemctl stop startv2m
+  python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
+if [ $python_version -gt 2 ];then
+  echo "已安装Python3"
+  apt-get update -y
+  apt-get install -y  vim python3-pip git
+  pip3 install --upgrade pip
+  pip install flask tornado
+  cd /var/local
+  mkdir v2master
+  cd v2master
+  git init
+  git pull  https://github.com/available2099/vpsmanage.git
+  git remote add upstream https://github.com/available2099/vpsmanage.git
+  git fetch upstream
+  pip install --no-cache-dir -r requirements.txt
+  chmod +x /var/local/v2master/startv2m.sh
+ # nohup python3 v2-ui.py &
+ python v2-ui.py
+  cp -f startv2m.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable startv2m
+    systemctl start startv2m
+    echo -e "${green}v2master 安装完成，面板已启动，"
+    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
+    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
+    echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
+fi
+
   #python3 v2-ui.py
 else
   python_v =  python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'

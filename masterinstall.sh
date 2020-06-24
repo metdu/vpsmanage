@@ -172,7 +172,7 @@ docker_install
 
 install_master(){
   systemctl stop v2master
-  python_version=$(python3 --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
+  python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
 if [ $python_version -gt 2 ];then
   echo "已安装Python3"
   apt-get update -y
@@ -187,13 +187,13 @@ if [ $python_version -gt 2 ];then
   git remote add upstream https://github.com/available2099/vpsmanage.git
   git fetch upstream
   pip install --no-cache-dir -r requirements.txt
-  chmod +x /var/local/v2master
+  chmod +x /var/local/v2master/startv2m.sh
  # nohup python3 v2-ui.py &
- python3 v2-ui.py
-  cp -f v2master.service /etc/systemd/system/
+ python v2-ui.py
+  cp -f startv2m.service /etc/systemd/system/
     systemctl daemon-reload
-    systemctl enable v2master
-    systemctl start v2master
+    systemctl enable startv2m
+    systemctl start startv2m
     echo -e "${green}v2master 安装完成，面板已启动，"
     echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
     echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"

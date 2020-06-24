@@ -189,22 +189,17 @@ install_master(){
           pip install --no-cache-dir -r requirements.txt
           chmod +x /var/local/v2master/startv2m.sh
          # nohup python3 v2-ui.py &
-         python v2-ui.py
+          python v2-ui.py
           cp -f startv2m.service /etc/systemd/system/
-            systemctl daemon-reload
-            systemctl enable startv2m
-            systemctl start startv2m
-            echo -e "${green}v2master 安装完成，面板已启动，"
-            echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
-            echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
-            echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
+          systemctl daemon-reload
+          systemctl enable startv2m
+          systemctl start startv2m
+          echo -e "${green}v2master 安装完成，面板已启动，"
+          echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
+          echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
+          echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
           #python3 v2-ui.py
-        else
-            python_v =  python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'
-             echo "已安装Python"+$python_v
-             echo "退出安装,需要安装Python3环境"
         fi
-fi
 elif [[ x"${release}" == x"ubuntu" ]]; then
     systemctl stop startv2m
     python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
@@ -233,10 +228,10 @@ elif [[ x"${release}" == x"ubuntu" ]]; then
         echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
         echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
         echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
-    else
-            python_v =  python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'
-             echo "已安装Python"+$python_v
-             echo "退出安装,需要安装Python3环境"
+    #else
+     #       python_v =  python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'
+      #       echo "已安装Python"+$python_v
+       #      echo "退出安装,需要安装Python3环境"
     fi
 elif [[ x"${release}" == x"debian" ]]; then
   systemctl stop startv2m

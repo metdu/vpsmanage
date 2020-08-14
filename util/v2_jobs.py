@@ -126,8 +126,8 @@ def dojob():
     scheduler.add_job(traffic_job, 'interval', seconds=20, id='test_job2')
     # 添加任务,时间间隔2S
     scheduler.add_job(create_node_job, 'interval', seconds=100, id='test_job3')
-    # 添加任务,时间间隔5S
-    scheduler.add_job(check_traffic_job, 'interval', seconds=200, id='test_job4')
+    # 添加任务,时间间隔5S 20200815 流量统计有bug暂时不使用
+    #scheduler.add_job(check_traffic_job, 'interval', seconds=200, id='test_job4')
     # 添加任务,时间间隔5S
     scheduler.add_job(server_info.refresh_status, 'interval', seconds=2, id='test_job5')
     scheduler.start()

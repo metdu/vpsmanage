@@ -166,14 +166,14 @@ docker_install
     systemctl enable inotifyconf
     systemctl start inotifyconf
     echo -e "${green}v2master 安装完成，面板已启动，"
-    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
-    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
+    echo -e "如果是全新安装，默认网页端口为 ${green}8085${plain}，用户名和密码默认都是 ${green}admin${plain}"
+    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 8085 端口已放行${plain}"
 }
 
 install_master(){
   if [[ x"${release}" == x"centos" ]]; then
-       systemctl stop startv2m
-        python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
+       #systemctl stop startv2m
+		python_version=$(python3 --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
         if [ $python_version -gt 2 ];then
           echo "已安装Python3"
           yum install -y  vim python3-pip git
@@ -188,21 +188,18 @@ install_master(){
           git fetch upstream
           pip install --no-cache-dir -r requirements.txt
           chmod +x /var/local/v2master/startv2m.sh
-         # nohup python3 v2-ui.py &
-          python v2-ui.py
           cp -f startv2m.service /etc/systemd/system/
           systemctl daemon-reload
           systemctl enable startv2m
           systemctl start startv2m
           echo -e "${green}v2master 安装完成，面板已启动，"
-          echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
-          echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
-          echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
-          #python3 v2-ui.py
+          echo -e "如果是全新安装，默认网页端口为 ${green}8085${plain}，用户名和密码默认都是 ${green}admin${plain}"
+          echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 8085 端口已放行${plain}"
+          echo -e "若想将 8085 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
         fi
 elif [[ x"${release}" == x"ubuntu" ]]; then
-    systemctl stop startv2m
-    python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
+    #systemctl stop startv2m
+    python_version=$(python3 --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
     if [ $python_version -gt 2 ];then
       echo "已安装Python3"
       apt-get update -y
@@ -218,24 +215,18 @@ elif [[ x"${release}" == x"ubuntu" ]]; then
       git fetch upstream
       pip install --no-cache-dir -r requirements.txt
       chmod +x /var/local/v2master/startv2m.sh
-     # nohup python3 v2-ui.py &
-      python v2-ui.py
       cp -f startv2m.service /etc/systemd/system/
         systemctl daemon-reload
         systemctl enable startv2m
         systemctl start startv2m
         echo -e "${green}v2master 安装完成，面板已启动，"
-        echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
-        echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
-        echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
-    #else
-     #       python_v =  python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}'
-      #       echo "已安装Python"+$python_v
-       #      echo "退出安装,需要安装Python3环境"
+        echo -e "如果是全新安装，默认网页端口为 ${green}8085${plain}，用户名和密码默认都是 ${green}admin${plain}"
+        echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 8085 端口已放行${plain}"
+        echo -e "若想将 8085 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
     fi
 elif [[ x"${release}" == x"debian" ]]; then
-  systemctl stop startv2m
-  python_version=$(python --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
+  #systemctl stop startv2m
+  python_version=$(python3 --version| awk -F " " '{print $NF}'| awk -F "." '{print $NF}')
   if [ $python_version -gt 2 ];then
     echo "已安装Python3"
     apt-get update -y
@@ -251,67 +242,16 @@ elif [[ x"${release}" == x"debian" ]]; then
     git fetch upstream
     pip install --no-cache-dir -r requirements.txt
     chmod +x /var/local/v2master/startv2m.sh
-   # nohup python3 v2-ui.py &
-   python v2-ui.py
     cp -f startv2m.service /etc/systemd/system/
       systemctl daemon-reload
       systemctl enable startv2m
       systemctl start startv2m
       echo -e "${green}v2master 安装完成，面板已启动，"
-      echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
-      echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
-      echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
+      echo -e "如果是全新安装，默认网页端口为 ${green}8085${plain}，用户名和密码默认都是 ${green}admin${plain}"
+      echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 8085 端口已放行${plain}"
+      echo -e "若想将 8085 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
    fi
 fi
-
-
-#  python3 v2-ui.py
-}
-install_v2-ui() {
-    systemctl stop v2-ui
-    cd /usr/local/
-    if [[ -e /usr/local/v2-ui/ ]]; then
-        rm /usr/local/v2-ui/ -rf
-    fi
-    last_version=$(curl -Ls "https://api.github.com/repos/sprov065/v2-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    echo -e "检测到v2-ui最新版本：${last_version}，开始安装"
-    wget -N --no-check-certificate -O /usr/local/v2-ui-linux.tar.gz https://github.com/sprov065/v2-ui/releases/download/${last_version}/v2-ui-linux.tar.gz
-    if [[ $? -ne 0 ]]; then
-        echo -e "${red}下载v2-ui失败，请确保你的服务器能够下载Github的文件，如果多次安装失败，请参考手动安装教程${plain}"
-        exit 1
-    fi
-    tar zxvf v2-ui-linux.tar.gz
-    rm v2-ui-linux.tar.gz -f
-    cd v2-ui
-    chmod +x v2-ui
-    cp -f v2-ui.service /etc/systemd/system/
-    systemctl daemon-reload
-    systemctl enable v2-ui
-    systemctl start v2-ui
-    echo -e "${green}v2-ui v${last_version}${plain} 安装完成，面板已启动，"
-    echo -e ""
-    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
-    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
-    echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
-    echo -e ""
-    echo -e "如果是更新面板，则按你之前的方式访问面板"
-    echo -e ""
-    curl -o /usr/bin/v2-ui -Ls https://raw.githubusercontent.com/available2099/vpsmanage/master/v2-ui.sh
-    chmod +x /usr/bin/v2-ui
-    echo -e "v2-ui 管理脚本使用方法: "
-    echo -e "----------------------------------------------"
-    echo -e "v2-ui              - 显示管理菜单 (功能更多)"
-    echo -e "v2-ui start        - 启动 v2-ui 面板"
-    echo -e "v2-ui stop         - 停止 v2-ui 面板"
-    echo -e "v2-ui restart      - 重启 v2-ui 面板"
-    echo -e "v2-ui status       - 查看 v2-ui 状态"
-    echo -e "v2-ui enable       - 设置 v2-ui 开机自启"
-    echo -e "v2-ui disable      - 取消 v2-ui 开机自启"
-    echo -e "v2-ui log          - 查看 v2-ui 日志"
-    echo -e "v2-ui update       - 更新 v2-ui 面板"
-    echo -e "v2-ui install      - 安装 v2-ui 面板"
-    echo -e "v2-ui uninstall    - 卸载 v2-ui 面板"
-    echo -e "----------------------------------------------"
 }
 
 echo -e "${green}开始安装${plain}"
@@ -319,6 +259,6 @@ install_base
 install_v2ray
 #install_docker
 install_master
-#close_firewall
+close_firewall
 #install_v2-uidocker
 #install_v2-ui

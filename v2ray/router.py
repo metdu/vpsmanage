@@ -100,6 +100,7 @@ def add_inbound():
         for device in devices:
             if local_ip != device.ip:
                 try:
+                    inbound.remark = device.country_code
                     requests.post("http://" + device.ip + ":"+str(config.get_port())+"/v2ray/inbound/add", inbound.to_json_vps(), timeout=13)
                 except:
                     print("Failed http")

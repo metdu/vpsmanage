@@ -25,8 +25,7 @@ def subscribe(setting_id):
             v2 = V2ray(node.desc, node.server,
                        node.v2_port, node.v2_id, node.v2_alter_id, node.v2_net, node.v2_path)
             shuchu = shuchu + "vmess://" + (base64.b64encode(json.dumps(v2.to_json()).encode('utf-8')).decode('ascii')) + '\n'
-
-    encodestr = base64.b64encode(shuchu.encode('utf-8')).decode('ascii')
+    encodestr = base64.b64encode(shuchu.encode('utf-8'))
     print(encodestr)
     return encodestr
 

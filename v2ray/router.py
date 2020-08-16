@@ -90,8 +90,6 @@ def add_inbound():
     # 是否更新所有服务器
     allvps = request.form['allvps']
     inbound = Inbound(port, listen, protocol, newsettings, stream_settings, sniffing, remark, user_level)
-    db.session.add(inbound)
-    db.session.commit()
     local_ip = get_ip()
     if allvps == 'true':
         print("更新所有vps")
@@ -109,7 +107,8 @@ def add_inbound():
         # 插入mysql 用户表,生成订阅
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)
-
+    db.session.add(inbound)
+    db.session.commit()
     # 插入mysql inbound
     #查询自己服务器重新赋值
     device = mysqlsesson.query(VpsDevice).filter(VpsDevice.server==local_ip).first()

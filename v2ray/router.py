@@ -108,7 +108,6 @@ def add_inbound():
         userSubscribe = UserSubscribe(base64.b64encode(email.encode('utf-8')), port, user_level, 1)
         mysqlsesson.add(userSubscribe)
     db.session.add(inbound)
-    db.session.commit()
     # 插入mysql inbound
     #查询自己服务器重新赋值
     device = mysqlsesson.query(VpsDevice).filter(VpsDevice.server==local_ip).first()
@@ -120,6 +119,7 @@ def add_inbound():
                    json.loads(stream_settings)['wsSettings']['path'], device.country_code, json.loads(stream_settings)['network'])
     mysqlsesson.add(Node)
     mysqlsesson.commit()
+    db.session.commit()
     return jsonify(
         Msg(True,
             gettext(u'Successfully added, will take effect within %(seconds)d seconds', seconds=__check_interval)

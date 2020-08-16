@@ -111,12 +111,14 @@ def add_inbound():
         mysqlsesson.add(userSubscribe)
 
     # 插入mysql inbound
-    inboundMysql = InboundMysql(local_ip, port, listen, protocol, newsettings, stream_settings, sniffing, remark)
+    #查询自己服务器重新赋值
+    device = mysqlsesson.query(VpsDevice).filter(VpsDevice.server==local_ip).first()
+    inboundMysql = InboundMysql(local_ip, port, listen, protocol, newsettings, stream_settings, sniffing, device.country_code)
     mysqlsesson.add(inboundMysql)
     # 插入mysql 节点表
     Node = VpsNode(protocol, local_ip, json.loads(settings)['clients'][0]['id'],
                    json.loads(settings)['clients'][0]['alterId'], port,
-                   json.loads(stream_settings)['wsSettings']['path'], remark, json.loads(stream_settings)['network'])
+                   json.loads(stream_settings)['wsSettings']['path'], device.country_code, json.loads(stream_settings)['network'])
     mysqlsesson.add(Node)
     mysqlsesson.commit()
     return jsonify(

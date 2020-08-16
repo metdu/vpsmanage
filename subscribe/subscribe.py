@@ -18,13 +18,13 @@ def subscribe(setting_id):
         return '{code":200,"msg":"不存在该订阅}'
     else:
         expire_time = V2ray("nextTime:"+str(User.expire_time), "8.8.8.8",
-                       9999,"b5a811d6-c13e-4000-9204-0c45b47e586a", "22","ws", "")
-        shuchu = shuchu + "vmess://" + (base64.b64encode(json.dumps(expire_time.to_json()).encode('utf-8')).decode('ascii')) + '\n'
+                       9999,"b5a811d6-c13e-4000-9204-0c45b47e586a", "22","ws", "").v2link()
+        shuchu = shuchu + expire_time + '\n'
         NodeList = mysqlsesson.query(VpsNode).filter(VpsNode.v2_port == User.user_port).all()
         for node in NodeList:
             v2 = V2ray(node.desc, node.server,
-                       node.v2_port, node.v2_id, node.v2_alter_id, node.v2_net, node.v2_path)
-            shuchu = shuchu + "vmess://" + (base64.b64encode(json.dumps(v2.to_json()).encode('utf-8')).decode('ascii')) + '\n'
+                       node.v2_port, node.v2_id, node.v2_alter_id, node.v2_net, node.v2_path).v2link()
+            shuchu = shuchu +v2 + '\n'
     encodestr = base64.b64encode(shuchu.encode('utf-8'))
     print(encodestr)
     return encodestr

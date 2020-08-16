@@ -19,12 +19,14 @@ def subscribe(setting_id):
     else:
         expire_time = V2ray("nextTime:"+str(User.expire_time), "8.8.8.8",
                        9999,"b5a811d6-c13e-4000-9204-0c45b47e586a", "22","ws", "").v2link()
-        shuchu = shuchu + expire_time + '\n'
+        genery = mysqlsesson.query(UserSubscribe).filter(UserSubscribe.code == 'ZGVtbwxx').first()
+
         NodeList = mysqlsesson.query(VpsNode).filter(VpsNode.v2_port == User.user_port).all()
         for node in NodeList:
             v2 = V2ray(node.desc, node.server,
                        node.v2_port, node.v2_id, node.v2_alter_id, node.v2_net, node.v2_path).v2link()
             shuchu = shuchu +v2 + '\n'
+        shuchu = shuchu + genery.fq_text + '\n'
     encodestr = base64.b64encode(shuchu.encode('utf-8'))
     print(encodestr)
     return encodestr
